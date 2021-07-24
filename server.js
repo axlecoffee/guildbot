@@ -1,3 +1,7 @@
+//Slash commands + admin perms ---> https://discord.com/api/oauth2/authorize?client_id=666672279828299804&permissions=8&scope=bot%20applications.commands
+//https://api.hypixel.net/player?key=${apikey}&uuid=${uuid}
+//https://api.mojang.com/users/profiles/minecraft/${username}
+
 const Discord = require("discord.js")
 const client = new Discord.Client()
 require('discord-buttons')(client);
@@ -78,7 +82,7 @@ client.on('channelCreate', (channel) => {
             let embed = new Discord.MessageEmbed()
                 .setColor(config.embedcolour.a)
                 .setTitle('**A staff member will be here to help you soon.**')
-                .setDescription(`**Looking to join the guild?**\n[Guild forums post](${config.links.forums_post})\n[Guild membership application](${config.links.guild_membership_application})\n**Applied and waiting for a response?**\nAsk a staff member to check your application. If it gets accepted, an invite will be sent to you when a staff member is online.\n**You aren\'t online?**\nAn offline invite will be sent. This means the next time you next log in, you will have 5 minutes to join the guild before the invite expires.`)
+                .setDescription(`**Looking to join the guild?**\n[Guild forums post](${config.links.forums_post})\nTo apply, run the **\*apply** command in a ticket.\n**Applied and waiting for a response?**\nAsk a staff member to check your application. If it gets accepted, an invite will be sent to you when a staff member is online.\n**You aren\'t online?**\nAn offline invite will be sent. This means the next time you next log in, you will have 5 minutes to join the guild before the invite expires.`) //[Guild membership application](${config.links.guild_membership_application})
                 .setTimestamp()
             channel.send(embed)
         }, 1000);

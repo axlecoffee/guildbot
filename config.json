@@ -3,12 +3,16 @@
     "guildid": "586583600464527385",
     "embedcolour": {
         "a":"1EC45B",
-        "b":"00AA00"
+        "b":"00AA00",
+        "c":"0075FC"
     },
     "links":{
         "guild_membership_application":"https://forms.gle/Z22fmSgzM7Wb5F539",
         "guild_staff_application":"https://forms.gle/SZguFrNbB8RiCSd27",
         "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/"
 
-    }
+    },
+    "applogschannel":"865893055009914891",
+    "appfowardingchannel":"",
+    "logchannel":"868074749765484574"
 }
