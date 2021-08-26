@@ -1,6 +1,7 @@
 {
     "prefix": "*",
     "guildid": "586583600464527385",
+    "hypixelguildid":"5ab117970cf201afed33a625",
     "embedcolour": {
         "a":"1EC45B",
         "b":"00AA00",
@@ -8,7 +9,7 @@
     },
     "links":{
         "guild_membership_application":"https://forms.gle/Z22fmSgzM7Wb5F539",
-        "guild_staff_application":"https://forms.gle/SZguFrNbB8RiCSd27",
+        "guild_staff_application":"https://forms.gle/3yA9wFU3LhLcRNT3A",
         "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/"
 
     },

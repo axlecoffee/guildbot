@@ -52,39 +52,59 @@ module.exports.run = async (client, message, args, config) => {
                         res.on('end', async () => {
                             data = JSON.parse(data_raw)
                             if (data.success == true) {
-                                let discord = data.player.socialMedia.links.DISCORD
-                                if (discord == message.author.tag) {
-                                    db.set(`accountLinks.${message.author.id}`, {
-                                        name: uuid_data.name,
-                                        uuid: uuid_data.id
-                                    }).save();
-                                    let logembed = new Discord.MessageEmbed()
-                                        .setColor(config.embedcolour.b)
-                                        .setTimestamp()
-                                        .setTitle('<:log_emoji:868054485933625346> LOG')
-                                        .addField(`**Account link successful.**`, `**Discord account tag:** ${message.author.tag}\n**Discord account ID:** ${message.author.id}\n**Minecraft account name:** ${uuid_data.name}\n**Minecraft account UUID:** ${uuid_data.id}\n`)
-                                    let logchannel = client.channels.cache.get(config.logchannel)
-                                    logchannel.send({
-                                        embed: logembed
-                                    })
-                                    let embed = new Discord.MessageEmbed()
-                                        .setColor(config.embedcolour.a)
-                                        .setTimestamp()
-                                        .addField("Success.", `Successfully linked **${uuid_data.name}** to **<@${message.author.id}>**`)
-                                    message.channel.send(embed)
+                                let socialmediadata = undefined;
+                                try {
+                                    socialmediadata = data.player.socialMedia.links.DISCORD
+                                } catch(err){}
+                                if (socialmediadata) {
+                                    let discord = data.player.socialMedia.links.DISCORD
+                                    if (discord == message.author.tag) {
+                                        db.set(`accountLinks.${message.author.id}`, {
+                                            name: uuid_data.name,
+                                            uuid: uuid_data.id
+                                        }).save();
+                                        let logembed = new Discord.MessageEmbed()
+                                            .setColor(config.embedcolour.b)
+                                            .setTimestamp()
+                                            .setTitle('<:log_emoji:868054485933625346> LOG')
+                                            .addField(`**Account link successful.**`, `**Discord account tag:** ${message.author.tag}\n**Discord account ID:** ${message.author.id}\n**Minecraft account name:** ${uuid_data.name}\n**Minecraft account UUID:** ${uuid_data.id}\n`)
+                                        let logchannel = client.channels.cache.get(config.logchannel)
+                                        logchannel.send({
+                                            embed: logembed
+                                        })
+                                        let embed = new Discord.MessageEmbed()
+                                            .setColor(config.embedcolour.a)
+                                            .setTimestamp()
+                                            .addField("Success.", `Successfully linked **${uuid_data.name}** to **<@${message.author.id}>**`)
+                                        message.channel.send(embed)
+                                    } else {
+                                        let embed = new Discord.MessageEmbed()
+                                            .setColor('RED')
+                                            .setTimestamp()
+                                            .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
+                                            .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
+                                        let msg = await message.channel.send(embed)
+                                        msg.delete({
+                                            timeout: 15000
+                                        })
+                                        message.delete({
+                                            timeout: 15000
+                                        })
+                                    }
                                 } else {
+                                    //Throw error -> User has not set their DISCORD account in game
                                     let embed = new Discord.MessageEmbed()
-                                        .setColor('RED')
-                                        .setTimestamp()
-                                        .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
-                                        .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
-                                    let msg = await message.channel.send(embed)
-                                    msg.delete({
-                                        timeout: 15000
-                                    })
-                                    message.delete({
-                                        timeout: 15000
-                                    })
+                                            .setColor('RED')
+                                            .setTimestamp()
+                                            .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
+                                            .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
+                                        let msg = await message.channel.send(embed)
+                                        msg.delete({
+                                            timeout: 15000
+                                        })
+                                        message.delete({
+                                            timeout: 15000
+                                        })
                                 }
                             } else {
                                 let embed = new Discord.MessageEmbed()

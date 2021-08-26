@@ -54,6 +54,12 @@ module.exports.run = async (client, button, config) => {
                             embed: sucessembed,
                             component: null
                         });
+                        let infoembed = new Discord.MessageEmbed()
+                            .setColor(config.embedcolour.a)
+                            .setTimestamp()
+                            .setTitle("<:log_emoji:868054485933625346> Warning:")
+                            .setDescription("Make sure to leave your current guild if you are in one, or we will not be able to send you an invitation.\nMake sure your guild invites are turned **on** in your privacy settings. You can view the settings inside the profile menu (Right click your head in slot 2 of your hotbar) from any lobby on the hypixel network.")
+                        message.channel.send(infoembed)
                         const logembed = new Discord.MessageEmbed()
                             .setColor("GREEN")
                             .setTimestamp()
