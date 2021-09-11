@@ -11,9 +11,13 @@
         "guild_membership_application":"https://forms.gle/Z22fmSgzM7Wb5F539",
         "guild_staff_application":"https://forms.gle/3yA9wFU3LhLcRNT3A",
         "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/"
-
     },
     "applogschannel":"865893055009914891",
     "appfowardingchannel":"",
-    "logchannel":"868074749765484574"
+    "logchannel":"868074749765484574",
+    "queuechannel":"885615816211595305",
+    "pingroleonappid":{
+        "a":"593049344480116737",
+        "b":"673604482176778272"
+    }
 }

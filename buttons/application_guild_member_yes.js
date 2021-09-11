@@ -49,17 +49,14 @@ module.exports.run = async (client, button, config) => {
                         let sucessembed = new Discord.MessageEmbed()
                             .setColor(config.embedcolour.a)
                             .setTimestamp()
-                            .addField('Your application was submitted.', 'Thank you.')
+                            .addField('Your application was accepted.', 'Thank you.')
+                            .addField("<:log_emoji:868054485933625346> Warning:", "Make sure to leave your current guild if you are in one, or we will not be able to send you an invitation.\nMake sure your guild invites are turned **on** in your privacy settings. You can view the settings inside the profile menu (Right click your head in slot 2 of your hotbar) from any lobby on the hypixel network.")
+                        message.channel.send(`<@&${config.pingroleonappid.a}> <@&${config.pingroleonappid.b}>`)
                         message.edit({
                             embed: sucessembed,
                             component: null
                         });
-                        let infoembed = new Discord.MessageEmbed()
-                            .setColor(config.embedcolour.a)
-                            .setTimestamp()
-                            .setTitle("<:log_emoji:868054485933625346> Warning:")
-                            .setDescription("Make sure to leave your current guild if you are in one, or we will not be able to send you an invitation.\nMake sure your guild invites are turned **on** in your privacy settings. You can view the settings inside the profile menu (Right click your head in slot 2 of your hotbar) from any lobby on the hypixel network.")
-                        message.channel.send(infoembed)
+
                         const logembed = new Discord.MessageEmbed()
                             .setColor("GREEN")
                             .setTimestamp()
@@ -68,6 +65,21 @@ module.exports.run = async (client, button, config) => {
                             .addField('**Successful application**', `**Questions 1-3 (requirements):**\nUser anwsered **YES**.\n**Linked IGN:**\n*${userData}*\n**Their network level:** ${networkLevelRaw}`)
                         channel = client.channels.cache.get(config.applogschannel)
                         channel.send(logembed)
+
+                        const queueembed = new Discord.MessageEmbed()
+                            .setColor(config.embedcolour.c)
+                            .setTimestamp()
+                            .addField(`**${userData}**`, `\`\`/g invite ${userData}\`\``)
+                        let deletebutton = new MessageButton()
+                            .setStyle(4)
+                            //.setEmoji('885607339854528593')
+                            .setLabel('Invite sent -> Delete from queue')
+                            .setID('delete_message')
+                        queuechannel = client.channels.cache.get(config.queuechannel)
+                        queuechannel.send({
+                            embed: queueembed,
+                            component: deletebutton
+                        })
                     } else {
                         let nembed = new Discord.MessageEmbed()
                             .setColor(config.embedcolour.a)
