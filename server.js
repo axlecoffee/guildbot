@@ -43,22 +43,38 @@ client.on('clickButton', async (button) => {
         return console.log(err);
     }
 })
+//Handle dropdown menus
+client.on('clickMenu', async (menu) => {
+    try {
+        let menuFile = require(`./menu/${menu.id}.js`);
+        menuFile.run(client, menu, config)
+    } catch (err) {
+        return console.log(err);
+    }
+})
 
 //Send login message and setup bot activity.
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.cache.find(guild => guild.id == config.guildid)
-    beforename = guild.name
-    client.user.setActivity(`over ${guild.name}`, {
-        type: "WATCHING"
-    }).then().catch(console.error);
-    setInterval(function () {
-        g = client.guilds.cache.find(guild => guild.id == config.guildid)
-        if (g.name != beforename) {
-            beforename = g.name
-            client.user.setActivity(`over ${guild.name}`, {type: "WATCHING"}).then().catch(console.error);
-        }
-    }, 60000);
+    if (client.user.id == "886676473019269160") {
+        console.log(`Test user detected, setting presence to OFFLINE.`)
+        client.user.setStatus('invisible')
+    } else {
+        guild = client.guilds.cache.find(guild => guild.id == config.guildid)
+        beforename = guild.name
+        client.user.setActivity(`over ${guild.name}`, {
+            type: "WATCHING"
+        }).then().catch(console.error);
+        setInterval(function () {
+            g = client.guilds.cache.find(guild => guild.id == config.guildid)
+            if (g.name != beforename) {
+                beforename = g.name
+                client.user.setActivity(`over ${guild.name}`, {
+                    type: "WATCHING"
+                }).then().catch(console.error);
+            }
+        }, 60000);
+    }
 })
 
 //Update the member counter channel when someone joins the server
