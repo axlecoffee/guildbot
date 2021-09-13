@@ -5,7 +5,7 @@ const {
 } = require('discord-buttons');
 
 module.exports.run = async (client, button, config) => {
-    button.defer()
+    button.reply.defer()
     let message = button.message
     message.delete()
 }

@@ -8,7 +8,7 @@ const https = require('https')
 require('dotenv').config()
 
 module.exports.run = async (client, button, config) => {
-    button.defer()
+    button.reply.defer()
     let message = button.message
     let userData;
     let userID;

@@ -13,11 +13,3 @@ module.exports.run = async (client, message, args) => {
         .addField("**Ping**", `${msg.createdTimestamp - message.createdTimestamp} ms`)
     msg.edit({embed: embed})
 }
-
-module.exports.help = async () => {
-    return {
-        name: "Ping command.",
-        desc: "Returns the bot's ping.",
-        args: ""
-    }
-}

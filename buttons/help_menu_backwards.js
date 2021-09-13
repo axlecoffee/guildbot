@@ -1,7 +1,7 @@
 const Discord = require('discord.js')
 
 module.exports.run = async (client, button, config) => {
-    button.defer()
+    button.reply.defer()
     let message = button.message
     
     /* message.edit({

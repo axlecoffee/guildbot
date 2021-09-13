@@ -1,9 +1,10 @@
 const Discord = require('discord.js')
 const https = require('https')
 const config = require('../config.json')
-require('dotenv').config()
 
 module.exports.run = async (client, message, args) => {
+    //TODO
+    /*
     //msgchannel = message.channel
     const req = https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelguildid}`, (res) => {
         let data = "";
@@ -38,8 +39,5 @@ module.exports.run = async (client, message, args) => {
     }).on("error", (err) => {
         console.log("Error: " + err.message);
     });
-}
-
-module.exports.help = async () => {
-    return {}
+    */
 }

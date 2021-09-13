@@ -13,6 +13,7 @@ module.exports.run = async (client, message, args, config) => {
         .setEmoji('◀️')
         .setLabel('')
         .setID('help_menu_backwards')
+        .setDisabled(true)
     let row = new MessageActionRow()
         .addComponent(buttonBackwards)
         .addComponent(buttonFoward)
@@ -25,13 +26,4 @@ module.exports.run = async (client, message, args, config) => {
 
     
     message.channel.send({embed: embed, component: row})
-}
-
-module.exports.help = async () => {
-    return {
-        name: "Help menu",
-        desc: "Shows you this help menu.",
-        args: "",
-        category: "misc"
-    }
 }

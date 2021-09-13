@@ -26,7 +26,3 @@ module.exports.run = async (client, message, args, config) => {
         component: row
     })
 }
-
-module.exports.help = async () => {
-    return {}
-}
