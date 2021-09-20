@@ -36,6 +36,6 @@ module.exports.run = async (client, menu, config) => {
                 }
             }
         }
-        menu.reply.send(`<:plus:886704907799896085> Applied - **${addedCounter}** roles\n<:minus:886704907841835109> Removed - **${removedCounter}** roles.`, true)
+        menu.reply.send(`<:plus:888072519582634075> Applied - **${addedCounter}** roles\n<:minus:888072653003452516> Removed - **${removedCounter}** roles.`, true)
     }
 }

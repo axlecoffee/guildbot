@@ -1,8 +1,11 @@
 const Discord = require('discord.js')
-const {MessageButton, MessageActionRow, ButtonCollector} = require('discord-buttons');
-const db = require('../stormdb.js')
+const {
+    MessageButton,
+    MessageActionRow,
+    ButtonCollector
+} = require('discord-buttons');
 
-module.exports.run = async (client, message, args, config) => {
+module.exports.run = async (client, button, config) => {
     let buttonFoward = new MessageButton()
         .setStyle(2)
         .setEmoji('▶️')
@@ -17,13 +20,17 @@ module.exports.run = async (client, message, args, config) => {
     let row = new MessageActionRow()
         .addComponent(buttonBackwards)
         .addComponent(buttonFoward)
+
+    button.reply.defer()
+    let message = button.message
+
     let totalSeconds = (client.uptime / 1000);
-        let days = Math.floor(totalSeconds / 86400);
-        totalSeconds %= 86400;
-        let hours = Math.floor(totalSeconds / 3600);
-        totalSeconds %= 3600;
-        let minutes = Math.floor(totalSeconds / 60);
-        let seconds = Math.floor(totalSeconds % 60);
+    let days = Math.floor(totalSeconds / 86400);
+    totalSeconds %= 86400;
+    let hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = Math.floor(totalSeconds % 60);
     const embed = new Discord.MessageEmbed()
         .setColor(config.embedcolour.b)
         .setTimestamp()
@@ -38,8 +45,8 @@ module.exports.run = async (client, message, args, config) => {
         .addField("Created on", client.user.createdAt)
         .setThumbnail(client.user.displayAvatarURL())
         .setFooter('Developed by @MCUniversity#0859')
-    
-
-    
-    message.channel.send({embed: embed, component: row})
+    message.edit({
+        embed: embed,
+        component: row
+    });
 }

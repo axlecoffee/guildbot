@@ -90,12 +90,14 @@ client.on('guildMemberRemove', (member) => {
         member.guild.channels.cache.get("698908097510375554").setName(`📊Members: ${num}📊`);
     }
 });
-client.on('guildMemberUpdate', (oldMember, newMember) => {
+//Booster announcement temporarly disabled.
+/*client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (oldMember.premiumSinceTimestamp != newMember.premiumSinceTimestamp) {
         newMember.guild.channels.cache.get("790097616973201459").send(`Thank you, ${newMember.user}, for boosting ${newMember.guild.name}!`)
         newMember.send(`Thank you for boosting ${newMember.guild.name}. You will recieve your booster role and its perks shortly.`)
     }
-})
+})*/
+
 //Send info message one second after someone creates a ticket
 client.on('channelCreate', (channel) => {
     if (channel.type == 'text' && channel.name.startsWith('ticket-')) {
