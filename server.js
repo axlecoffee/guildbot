@@ -9,10 +9,27 @@ const db = require("./stormdb.js")
 const ms = require("parse-ms")
 const https = require('https')
 const config = require('./config.json')
+const wordBlackList = require('./wordBlackList.json')
 require('dotenv').config()
 
 //Handle commands (DM COMMANDS ARE ONLY IN DMS, NORMAL COMMANDS ARE ONLY OUTSIDE OF DMS)
 client.on('message', message => {
+    if (message.author.id != client.user.id && message.author.bot != true && message.guild.id == config.guildid && message.content.indexOf(config.prefix) !== 0) {
+        let sendOff = false
+        let desc = `User: <@${message.author.id}> (ID: ${message.author.id})\nMessage: \`\`${message.content}\`\`\nMatches: `
+        for (let i = 0;i<wordBlackList.length;i++) {
+            if (message.content.includes(wordBlackList[i])) {
+                sendOff = true;
+                desc+=`\`\`${wordBlackList[i]}\`\` `;
+            }
+        }
+        if (sendOff == true) {
+            let embed = new Discord.MessageEmbed().setColor('RED').setTimestamp().setTitle("<:warning_emoji:868054485992357948> Message deleted due to match from word blacklist.").setDescription(desc)
+            message.delete()
+            let logchannel = client.channels.cache.get(config.logchannel)
+            logchannel.send({embed: embed})
+        }
+    }
     if (message.author.bot) return;
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g)
     const command = args.shift().toLowerCase();

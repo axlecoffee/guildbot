@@ -6,8 +6,9 @@ const {
 const db = require("../stormdb.js")
 const https = require('https')
 require('dotenv').config()
+const config = require('../config.json')
 
-module.exports.run = async (client, button, config) => {
+module.exports.run = async (client, button) => {
     button.reply.defer()
     let message = button.message
     let userData;
@@ -45,7 +46,7 @@ module.exports.run = async (client, button, config) => {
                 if (data.success == true) {
                     networkLevel = Math.round((Math.sqrt((2 * parseInt(data.player.networkExp)) + 30625) / 50) - 2.5)
                     networkLevelRaw = (Math.sqrt((2 * parseInt(data.player.networkExp)) + 30625) / 50) - 2.5
-                    if (networkLevel >= 35) {
+                    if (networkLevel >= 50) {
                         let sucessembed = new Discord.MessageEmbed()
                             .setColor(config.embedcolour.a)
                             .setTimestamp()
@@ -80,11 +81,12 @@ module.exports.run = async (client, button, config) => {
                             embed: queueembed,
                             component: deletebutton
                         })
+                        button.clicker.member.roles.add(config.roles.guildMemberRole)
                     } else {
                         let nembed = new Discord.MessageEmbed()
                             .setColor(config.embedcolour.a)
                             .setTimestamp()
-                            .setTitle(`**We're sorry but you do not meet the requirements to join the guild.**\nRequired network level: 35\nYour network level: ${networkLevelRaw}`)
+                            .setTitle(`**We're sorry but you do not meet the requirements to join the guild.**\nRequired network level: 50\nYour network level: ${networkLevelRaw}`)
                         message.edit({
                             embed: nembed,
                             component: null
@@ -94,7 +96,7 @@ module.exports.run = async (client, button, config) => {
                             .setTimestamp()
                             .setAuthor(button.clicker.user.tag)
                             .setThumbnail(button.clicker.user.displayAvatarURL())
-                            .addField('**Failed application**', `**User did not meet the network level 35 requirement.**\nTheir IGN: ${userData}\nTheir NW level: ${networkLevelRaw}`)
+                            .addField('**Failed application**', `**User did not meet the network level 50 requirement.**\nTheir IGN: ${userData}\nTheir NW level: ${networkLevelRaw}`)
                         channel = client.channels.cache.get(config.applogschannel)
                         channel.send(logembed)
                     }

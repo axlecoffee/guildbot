@@ -11,7 +11,7 @@ module.exports.run = async (client, button, config) => {
         .setColor(config.embedcolour.a)
         .setTimestamp()
     if (message.channel.type == 'text' && message.channel.name.startsWith('ticket-')) {
-        nembed.addField('Do you agree with the following:', `**1.** I can be active at least twice a week\n**2.** My Hypixel network level is 35 or higher\n**3.** I can contribute at least 50k guild exp per week`)
+        nembed.addField('Do you agree with the following:', `**1.** I can be active at least twice a week\n**2.** My Hypixel network level is 50 or higher\n**3.** I can contribute at least 100k guild exp per week`)
             let yesbutton = new MessageButton()
                 .setStyle(1)
                 .setEmoji('865975626774609920') //865887075509338122
