@@ -2,22 +2,21 @@ const Discord = require('discord.js')
 const {
     MessageButton,
     MessageActionRow
-} = require('discord-buttons');
+} = require('discord.js');
 const db = require("../stormdb.js")
 const https = require('https')
 require('dotenv').config()
 const config = require('../config.json')
 
 module.exports.run = async (client, button) => {
-    button.reply.defer()
     let message = button.message
     let userData;
     let userID;
-    if (db.get(`accountLinks`).get(`${button.clicker.user.id}`).value() == undefined) {
+    if (db.get(`accountLinks`).get(`${button.user.id}`).value() == undefined) {
         userData = undefined;
     } else {
-        userData = db.get(`accountLinks`).get(`${button.clicker.user.id}`).get(`name`).value()
-        userID = db.get(`accountLinks`).get(`${button.clicker.user.id}`).get(`uuid`).value()
+        userData = db.get(`accountLinks`).get(`${button.user.id}`).get(`name`).value()
+        userID = db.get(`accountLinks`).get(`${button.user.id}`).get(`uuid`).value()
     }
 
     if (userData == undefined) {
@@ -29,10 +28,12 @@ module.exports.run = async (client, button) => {
             .setStyle(1)
             .setEmoji('ℹ️')
             .setLabel('Learn more.')
-            .setID('link_help_button')
-        message.edit({
-            embed: undefinedEmbed,
-            component: linkHelpButton
+            .setCustomId('link_help_button')
+        let row = new MessageActionRow()
+            .addComponents(linkHelpButton)
+        button.update({
+            embeds: [undefinedEmbed],
+            components: [row]
         });
     } else {
         const req = https.get(`https://api.hypixel.net/player?key=${process.env.APIKEY}&uuid=${userID}`, (res) => {
@@ -53,19 +54,19 @@ module.exports.run = async (client, button) => {
                             .addField('Your application was accepted.', 'Thank you.')
                             .addField("<:log_emoji:868054485933625346> Warning:", "Make sure to leave your current guild if you are in one, or we will not be able to send you an invitation.\nMake sure your guild invites are turned **on** in your privacy settings. You can view the settings inside the profile menu (Right click your head in slot 2 of your hotbar) from any lobby on the hypixel network.")
                         message.channel.send(`<@&${config.pingroleonappid.a}> <@&${config.pingroleonappid.b}>`)
-                        message.edit({
-                            embed: sucessembed,
-                            component: null
+                        button.update({
+                            embeds: [sucessembed],
+                            components: []
                         });
 
                         const logembed = new Discord.MessageEmbed()
                             .setColor("GREEN")
                             .setTimestamp()
-                            .setAuthor(button.clicker.user.tag)
-                            .setThumbnail(button.clicker.user.displayAvatarURL())
+                            .setAuthor(button.user.tag)
+                            .setThumbnail(button.user.displayAvatarURL())
                             .addField('**Successful application**', `**Questions 1-3 (requirements):**\nUser anwsered **YES**.\n**Linked IGN:**\n*${userData}*\n**Their network level:** ${networkLevelRaw}`)
                         channel = client.channels.cache.get(config.applogschannel)
-                        channel.send(logembed)
+                        channel.send({embeds: [logembed]})
 
                         const queueembed = new Discord.MessageEmbed()
                             .setColor(config.embedcolour.c)
@@ -75,30 +76,32 @@ module.exports.run = async (client, button) => {
                             .setStyle(4)
                             //.setEmoji('885607339854528593')
                             .setLabel('Invite sent -> Delete from queue')
-                            .setID('delete_message')
+                            .setCustomId('delete_message')
+                        let row = new MessageActionRow()
+                            .addComponents(deletebutton)
                         queuechannel = client.channels.cache.get(config.queuechannel)
                         queuechannel.send({
-                            embed: queueembed,
-                            component: deletebutton
+                            embeds: [queueembed],
+                            components: [row]
                         })
-                        button.clicker.member.roles.add(config.roles.guildMemberRole)
+                        button.member.roles.add(config.roles.guildMemberRole)
                     } else {
                         let nembed = new Discord.MessageEmbed()
                             .setColor(config.embedcolour.a)
                             .setTimestamp()
                             .setTitle(`**We're sorry but you do not meet the requirements to join the guild.**\nRequired network level: 50\nYour network level: ${networkLevelRaw}`)
-                        message.edit({
-                            embed: nembed,
-                            component: null
+                        button.update({
+                            embeds: [nembed],
+                            components: []
                         });
                         const logembed = new Discord.MessageEmbed()
                             .setColor("RED")
                             .setTimestamp()
-                            .setAuthor(button.clicker.user.tag)
-                            .setThumbnail(button.clicker.user.displayAvatarURL())
+                            .setAuthor(button.user.tag)
+                            .setThumbnail(button.user.displayAvatarURL())
                             .addField('**Failed application**', `**User did not meet the network level 50 requirement.**\nTheir IGN: ${userData}\nTheir NW level: ${networkLevelRaw}`)
                         channel = client.channels.cache.get(config.applogschannel)
-                        channel.send(logembed)
+                        channel.send({embeds: [logembed]})
                     }
                 } else {
                     let embed = new Discord.MessageEmbed()
@@ -106,7 +109,7 @@ module.exports.run = async (client, button) => {
                         .setTimestamp()
                         .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
                         .addField(`**${data.cause}**`, `*This probably means the API key is invalid. Ping <@299265668522442752>.*`)
-                    let msg = await message.channel.send(embed)
+                    let msg = await message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                     msg.delete({
                         timeout: 15000
                     })
@@ -119,8 +122,9 @@ module.exports.run = async (client, button) => {
                         .setTitle('<:error_emoji:868054485946224680> ERROR')
                         .addField(`**Cause: **`, `A player ran a bot command and the Hypixel API key provided by the config file was invalid.`)
                     let logchannel = client.channels.cache.get(config.logchannel)
-                    logchannel.send("<@299265668522442752> <@299265668522442752> <@299265668522442752>", {
-                        embed: logembed
+                    logchannel.send({
+                        content: "<@299265668522442752> <@299265668522442752> <@299265668522442752>",
+                        embeds: [logembed]
                     })
                 }
             })

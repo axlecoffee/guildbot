@@ -29,7 +29,7 @@ module.exports.run = async (client, message, args, config) => {
         } else {
             embed.addField("This account is linked!", `**Minecraft account:** ${userData}`)
         }
-        message.channel.send(embed)
+        message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
 
         //Fetch data from DB based on message author ID
 
@@ -70,20 +70,20 @@ module.exports.run = async (client, message, args, config) => {
                                             .addField(`**Account link successful.**`, `**Discord account tag:** ${message.author.tag}\n**Discord account ID:** ${message.author.id}\n**Minecraft account name:** ${uuid_data.name}\n**Minecraft account UUID:** ${uuid_data.id}\n`)
                                         let logchannel = client.channels.cache.get(config.logchannel)
                                         logchannel.send({
-                                            embed: logembed
+                                            embeds: [logembed]
                                         })
                                         let embed = new Discord.MessageEmbed()
                                             .setColor(config.embedcolour.a)
                                             .setTimestamp()
                                             .addField("Success.", `Successfully linked **${uuid_data.name}** to **<@${message.author.id}>**`)
-                                        message.channel.send(embed)
+                                        message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                     } else {
                                         let embed = new Discord.MessageEmbed()
                                             .setColor('RED')
                                             .setTimestamp()
                                             .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
                                             .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
-                                        let msg = await message.channel.send(embed)
+                                        let msg = await message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                         msg.delete({
                                             timeout: 15000
                                         })
@@ -98,7 +98,7 @@ module.exports.run = async (client, message, args, config) => {
                                             .setTimestamp()
                                             .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
                                             .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
-                                        let msg = await message.channel.send(embed)
+                                        let msg = await message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                         msg.delete({
                                             timeout: 15000
                                         })
@@ -112,7 +112,7 @@ module.exports.run = async (client, message, args, config) => {
                                     .setTimestamp()
                                     .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
                                     .addField(`**${data.cause}**`, `*This probably means the API key is invalid. Ping <@299265668522442752>.*`)
-                                let msg = await message.channel.send(embed)
+                                let msg = await message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                 msg.delete({
                                     timeout: 15000
                                 })
@@ -125,14 +125,15 @@ module.exports.run = async (client, message, args, config) => {
                                     .setTitle('<:error_emoji:868054485946224680> ERROR')
                                     .addField(`**Cause: **`, `A player ran a bot command and the Hypixel API key provided by the config file was invalid.`)
                                 let logchannel = client.channels.cache.get(config.logchannel)
-                                logchannel.send("<@299265668522442752> <@299265668522442752> <@299265668522442752>", {
-                                    embed: logembed
+                                logchannel.send({
+                                    content: "<@299265668522442752> <@299265668522442752> <@299265668522442752>", 
+                                    embeds: [logembed]
                                 })
                             }
 
                         })
                     }).on("error", (err) => {
-                        console.log("Error: " + err.message);
+                        console.error(err.message);
                     });
 
 
@@ -142,7 +143,7 @@ module.exports.run = async (client, message, args, config) => {
                         .setTimestamp()
                         .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
                         .addField(`**${uuid_data.error}**`, `**${uuid_data.errorMessage}**\n*This probably means the username you entered does not exist.*`)
-                    let msg = await message.channel.send(embed)
+                    let msg = await message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                     msg.delete({
                         timeout: 15000
                     })
@@ -152,14 +153,14 @@ module.exports.run = async (client, message, args, config) => {
                 }
             })
         }).on("error", (err) => {
-            console.log("Error: " + err.message);
+            console.error(err.message);
         });
     } else if (args[0] == 'tutorial') {
-        message.channel.send({
+        message.reply({
             files: [{
                 attachment: './discord_link_tutorial.gif',
                 name: 'tutorial.gif'
-            }]
+            }], allowedMentions: { repliedUser: false }
         })
     } else {
         let embed = new Discord.MessageEmbed()
@@ -167,6 +168,6 @@ module.exports.run = async (client, message, args, config) => {
             .setTimestamp()
             .addField("Account linking system.", "**This system is in place to make applying to join the guild easier. It links your discord account with your minecraft account.\nCommands:**\n\*link help - Open this menu\n\*link check [ID] - Check your own status, or the status of another person\n\*link update <IGN> - Create/update the minecraft account linked to your discord account.\n\*link tutorial - Shows a gif with the tutorial on how to link your discord")
             .setFooter('[Optional parameter] | <Required parameter>')
-        message.channel.send(embed)
+        message.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
     }
 }

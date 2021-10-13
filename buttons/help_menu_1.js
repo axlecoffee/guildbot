@@ -1,23 +1,19 @@
 const Discord = require('discord.js')
-const {MessageButton,MessageActionRow,ButtonCollector} = require('discord-buttons');
+const {MessageButton,MessageActionRow} = require('discord.js');
 
 module.exports.run = async (client, button, config) => {
     let buttonFoward = new MessageButton()
         .setStyle(2)
         .setEmoji('▶️')
         .setLabel('')
-        .setID('help_menu_2')
+        .setCustomId('help_menu_2')
     let buttonBackwards = new MessageButton()
         .setStyle(2)
         .setEmoji('◀️')
         .setLabel('')
-        .setID('help_menu_0')
+        .setCustomId('help_menu_0')
     let row = new MessageActionRow()
-        .addComponent(buttonBackwards)
-        .addComponent(buttonFoward)
-
-    button.reply.defer()
-    let message = button.message
+        .addComponents(buttonBackwards, buttonFoward)
 
     const embed = new Discord.MessageEmbed()
         .setColor(config.embedcolour.b)
@@ -28,8 +24,8 @@ module.exports.run = async (client, button, config) => {
         .addField("*link", "System for linking minecraft accounts to discord accounts to verify ownership of account and more. Run command for more info.", true)
         .addField("*apply", "Apply for membership in the guild or to join the guild's staff team.", true)
         .setFooter('Developed by @MCUniversity#0859')
-    message.edit({
-        embed: embed,
-        component: row
+    button.update({
+        embeds: [embed],
+        components: [row]
     });
 }

@@ -1,28 +1,23 @@
 const Discord = require('discord.js')
 const {
     MessageButton,
-    MessageActionRow,
-    ButtonCollector
-} = require('discord-buttons');
+    MessageActionRow
+} = require('discord.js');
 
 module.exports.run = async (client, button, config) => {
     let buttonFoward = new MessageButton()
         .setStyle(2)
         .setEmoji('▶️')
         .setLabel('')
-        .setID('help_menu_1')
+        .setCustomId('help_menu_1')
     let buttonBackwards = new MessageButton()
         .setStyle(2)
         .setEmoji('◀️')
         .setLabel('')
-        .setID('help_menu_backwards')
+        .setCustomId('help_menu_backwards')
         .setDisabled(true)
     let row = new MessageActionRow()
-        .addComponent(buttonBackwards)
-        .addComponent(buttonFoward)
-
-    button.reply.defer()
-    let message = button.message
+        .addComponents(buttonBackwards, buttonFoward)
 
     let totalSeconds = (client.uptime / 1000);
     let days = Math.floor(totalSeconds / 86400);
@@ -42,11 +37,11 @@ module.exports.run = async (client, button, config) => {
         .addField("Emoji", `<:KannaSip:889543061821063189> ${client.emojis.cache.size}`, true)
         .addField("Bot repository", `<:github:888155742719328276> [GitHub](https://github.com/MCUniversity/guildbot)`, true)
         .addField("Bot library", "[Discord.js v12](https://discord.js.org/#/docs/main/v12/)", true)
-        .addField("Created on", client.user.createdAt)
+        .addField("Created on", `${client.user.createdAt}`)
         .setThumbnail(client.user.displayAvatarURL())
         .setFooter('Developed by @MCUniversity#0859')
-    message.edit({
-        embed: embed,
-        component: row
+    button.update({
+        embeds: [embed],
+        components: [row]
     });
 }

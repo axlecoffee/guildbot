@@ -2,18 +2,29 @@
 //https://api.hypixel.net/player?key=${apikey}&uuid=${uuid}
 //https://api.mojang.com/users/profiles/minecraft/${username}
 
-const Discord = require("discord.js")
-const client = new Discord.Client()
-require('discord-buttons')(client);
+const fs = require('fs');
 const db = require("./stormdb.js")
 const ms = require("parse-ms")
 const https = require('https')
+
+const Discord = require("discord.js")
+const { Intents, Collection } = require('discord.js')
+const allIntents = new Intents(32767); const client = new Discord.Client({ intents: allIntents }); //Uses all intents. The bot runs in a single server so it does not matter.
+
 const config = require('./config.json')
 const wordBlackList = require('./wordBlackList.json')
 require('dotenv').config()
 
+client.on('error', async (err) => {
+    const channel = await client.channels.cache.get(config.logchannel)
+    const embed = new Discord.MessageEmbed()
+        .setTitle('<:error_emoji:868054485946224680> A DiscordAPIError has occurred.')
+        .addField('**Cause: **', `\`\`${err.message}\`\``)
+    channel.send({embeds:[embed]})
+})
+
 //Handle commands (DM COMMANDS ARE ONLY IN DMS, NORMAL COMMANDS ARE ONLY OUTSIDE OF DMS)
-client.on('message', message => {
+client.on('messageCreate', message => {
     if (message.author.id != client.user.id && message.author.bot != true && message.guild.id == config.guildid && message.content.indexOf(config.prefix) !== 0) {
         let sendOff = false
         let desc = `User: <@${message.author.id}> (ID: ${message.author.id})\nMessage: \`\`${message.content}\`\`\nMatches: `
@@ -27,7 +38,7 @@ client.on('message', message => {
             let embed = new Discord.MessageEmbed().setColor('RED').setTimestamp().setTitle("<:warning_emoji:868054485992357948> Message deleted due to match from word blacklist.").setDescription(desc)
             message.delete()
             let logchannel = client.channels.cache.get(config.logchannel)
-            logchannel.send({embed: embed})
+            return logchannel.send({embeds: [embed]})
         }
     }
     if (message.author.bot) return;
@@ -46,51 +57,43 @@ client.on('message', message => {
             let commandFile = require(`./dm-commands/${command}.js`);
             commandFile.run(client, message, args, config)
         } catch (err) {
-            console.log(err)
+            return console.log(err)
         }
     }
 })
 
-//Handle buttons
-client.on('clickButton', async (button) => {
-    try {
-        let buttonFile = require(`./buttons/${button.id}.js`);
-        buttonFile.run(client, button, config)
-    } catch (err) {
-        return console.log(err);
+//Handle buttons and select menus
+
+client.on('interactionCreate', (interaction) => {
+	if (interaction.isButton()) {
+        button = interaction;
+        try {
+            let buttonFile = require(`./buttons/${button.customId}.js`);
+            buttonFile.run(client, button, config)
+        } catch (err) {
+            return console.log(err);
+        }
+    } else if (interaction.isSelectMenu()) {
+        menu = interaction;
+        try {
+            let menuFile = require(`./menu/${menu.customId}.js`);
+            menuFile.run(client, menu, config)
+        } catch (err) {
+            return console.log(err);
+        }
     }
-})
-//Handle dropdown menus
-client.on('clickMenu', async (menu) => {
-    try {
-        let menuFile = require(`./menu/${menu.id}.js`);
-        menuFile.run(client, menu, config)
-    } catch (err) {
-        return console.log(err);
-    }
-})
+});
+
 
 //Send login message and setup bot activity.
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     if (client.user.id == "886676473019269160") {
         console.log(`Test user detected, setting presence to OFFLINE.`)
-        client.user.setStatus('invisible')
+        client.user.setPresence({ status: 'invisible' })
     } else {
         guild = client.guilds.cache.find(guild => guild.id == config.guildid)
-        beforename = guild.name
-        client.user.setActivity(`over ${guild.name}`, {
-            type: "WATCHING"
-        }).then().catch(console.error);
-        setInterval(function () {
-            g = client.guilds.cache.find(guild => guild.id == config.guildid)
-            if (g.name != beforename) {
-                beforename = g.name
-                client.user.setActivity(`over ${guild.name}`, {
-                    type: "WATCHING"
-                }).then().catch(console.error);
-            }
-        }, 60000);
+        client.user.setActivity(`over ${guild.name}`, {type: "WATCHING"})
     }
 })
 
@@ -107,24 +110,17 @@ client.on('guildMemberRemove', (member) => {
         member.guild.channels.cache.get("698908097510375554").setName(`📊Members: ${num}📊`);
     }
 });
-//Booster announcement temporarly disabled.
-/*client.on('guildMemberUpdate', (oldMember, newMember) => {
-    if (oldMember.premiumSinceTimestamp != newMember.premiumSinceTimestamp) {
-        newMember.guild.channels.cache.get("790097616973201459").send(`Thank you, ${newMember.user}, for boosting ${newMember.guild.name}!`)
-        newMember.send(`Thank you for boosting ${newMember.guild.name}. You will recieve your booster role and its perks shortly.`)
-    }
-})*/
 
 //Send info message one second after someone creates a ticket
 client.on('channelCreate', (channel) => {
-    if (channel.type == 'text' && channel.name.startsWith('ticket-')) {
+    if (channel.type == 'GUILD_TEXT' && channel.name.startsWith('ticket-')) {
         setTimeout(() => {
             let embed = new Discord.MessageEmbed()
                 .setColor(config.embedcolour.a)
                 .setTitle('**A staff member will be here to help you soon.**')
                 .setDescription(`**Looking to join the guild?**\n[Guild forums post](${config.links.forums_post})\nTo apply, run the **\*apply** command in a ticket.\n**Applied and waiting for a response?**\nAsk a staff member to check your application. If it gets accepted, an invite will be sent to you when a staff member is online.\n**You aren\'t online?**\nAn offline invite will be sent. This means the next time you next log in, you will have 5 minutes to join the guild before the invite expires.`) //[Guild membership application](${config.links.guild_membership_application})
                 .setTimestamp()
-            channel.send(embed)
+            channel.send({embeds: [embed]})
         }, 1000);
     }
 })

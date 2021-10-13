@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const {MessageButton, MessageActionRow, ButtonCollector} = require('discord-buttons');
+const {MessageButton, MessageActionRow} = require('discord.js');
 const db = require('../stormdb.js')
 
 module.exports.run = async (client, message, args, config) => {
@@ -7,16 +7,15 @@ module.exports.run = async (client, message, args, config) => {
         .setStyle(2)
         .setEmoji('▶️')
         .setLabel('')
-        .setID('help_menu_1')
+        .setCustomId('help_menu_1')
     let buttonBackwards = new MessageButton()
         .setStyle(2)
         .setEmoji('◀️')
         .setLabel('')
-        .setID('help_menu_backwards')
+        .setCustomId('help_menu_backwards')
         .setDisabled(true)
     let row = new MessageActionRow()
-        .addComponent(buttonBackwards)
-        .addComponent(buttonFoward)
+        .addComponents(buttonBackwards, buttonFoward)
     let totalSeconds = (client.uptime / 1000);
         let days = Math.floor(totalSeconds / 86400);
         totalSeconds %= 86400;
@@ -34,12 +33,12 @@ module.exports.run = async (client, message, args, config) => {
         .addField("Users", `:bust_in_silhouette: ${client.users.cache.size}`, true)
         .addField("Emoji", `<:KannaSip:889543061821063189> ${client.emojis.cache.size}`, true)
         .addField("Bot repository", `<:github:888155742719328276> [GitHub](https://github.com/MCUniversity/guildbot)`, true)
-        .addField("Bot library", "[Discord.js v12](https://discord.js.org/#/docs/main/v12/)", true)
-        .addField("Created on", client.user.createdAt)
+        .addField("Bot library", "[Discord.js v13](https://discord.js.org/#/docs/main/)", true)
+        .addField("Created on", `${client.user.createdAt}`)
         .setThumbnail(client.user.displayAvatarURL())
         .setFooter('Developed by @MCUniversity#0859')
     
 
     
-    message.channel.send({embed: embed, component: row})
+    message.reply({embeds: [embed], components: [row], allowedMentions: { repliedUser: false }})
 }
