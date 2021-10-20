@@ -1,0 +1,33 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const Discord = require('discord.js')
+const config = require('../config.json')
+
+module.exports = {
+    help: true,
+    data: new SlashCommandBuilder()
+        .setName('guild')
+        .setDescription(`Access data about the guild.`),
+    async execute(client, interaction) {
+        https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {
+            let data = ""; let hGuild = {}
+            res.on('data', data_chunk => {data += data_chunk;})
+            res.on('end', () => { hGuild = JSON.parse(data)
+                if (hGuild.success) {
+                    hGuild.guild.members.forEach(member => {
+                        https.get(`https://sessionserver.mojang.com/session/minecraft/profile/${member.uuid}`, (memberdata) => {
+                            let mojangdata = ""; memberdata.on('data', data_chunk => {mojangdata += data_chunk;})
+                            memberdata.on('end', () => {
+                                message.channel.send(JSON.stringify({
+                                    name: mojangdata.name,
+                                    uuid: member.uuid,
+                                    rank: member.rank,
+                                    expHistory: member.expHistory
+                                }))
+                            })
+                        })
+                    })
+                } else {console.error(hGuild.cause)}
+            })
+        }).on("error", (err) => {console.log("Error: " + err.message);});
+    },
+};

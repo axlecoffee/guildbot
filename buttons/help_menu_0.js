@@ -36,7 +36,7 @@ module.exports.run = async (client, button, config) => {
         .addField("Users", `:bust_in_silhouette: ${client.users.cache.size}`, true)
         .addField("Emoji", `<:KannaSip:889543061821063189> ${client.emojis.cache.size}`, true)
         .addField("Bot repository", `<:github:888155742719328276> [GitHub](https://github.com/MCUniversity/guildbot)`, true)
-        .addField("Bot library", "[Discord.js v12](https://discord.js.org/#/docs/main/v12/)", true)
+        .addField("Bot library", "[**Discord.js v13**](https://discord.js.org/#/docs/main/)", true)
         .addField("Created on", `${client.user.createdAt}`)
         .setThumbnail(client.user.displayAvatarURL())
         .setFooter('Developed by @MCUniversity#0859')

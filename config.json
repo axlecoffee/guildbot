@@ -1,28 +1,26 @@
 {
-    "version":"1.2.0",
-    "prefix": "*",
-    "guildid": "586583600464527385",
-    "hypixelguildid":"5ab117970cf201afed33a625",
+    "version":"1.2.5",
+    "guildId": "586583600464527385",
+    "hypixelGuildId":"5ab117970cf201afed33a625",
     "embedcolour": {
         "a":"1EC45B",
         "b":"00AA00",
         "c":"0075FC"
     },
     "roles":{
-        "guildMemberRole":"593101293778632724"
+        "guildMemberRole":"593101293778632724",
+        "helpers":["593049344480116737", "673604482176778272"]
+    },
+    "channels":{
+        "logChannelId":"868074749765484574",
+        "appLogChannelId":"865893055009914891",
+        "queueChannelId":"885615816211595305",
+        "ticketCategoryId":"897821535639834644"
     },
     "links":{
         "guild_membership_application":"https://forms.gle/Z22fmSgzM7Wb5F539",
         "guild_staff_application":"https://forms.gle/3yA9wFU3LhLcRNT3A",
         "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/"
-    },
-    "applogschannel":"865893055009914891",
-    "appfowardingchannel":"",
-    "logchannel":"868074749765484574",
-    "queuechannel":"885615816211595305",
-    "pingroleonappid":{
-        "a":"593049344480116737",
-        "b":"673604482176778272"
     },
     "supportServerInviteCode":"whGyz8ABM5"
 }

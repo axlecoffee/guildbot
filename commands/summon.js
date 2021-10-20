@@ -1,11 +1,25 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
-const { MessageSelectMenu } = require('discord.js');
 
-module.exports.run = async (client, message, args) => {
-    if (message.member.roles.cache.has('592743020609142796') || message.member.roles.cache.has('586584388704272400')) {
-        message.delete()
-        if (args[0] == "rr_colour") {
+module.exports = {
+    help: false,
+    permissions: [{id:"592743020609142796", type:1, permission:true}],
+    data: new SlashCommandBuilder()
+        .setName('summon')
+        .setDefaultPermission(false)
+        .setDescription(`Summons a demon. Don't let Chongyun find you.`)
+        .addStringOption(option => 
+            option
+                .setName('object')
+                .setDescription('Select and object you would like to summon.')
+                .setRequired(true)
+                .addChoice('Select menu for colour roles', 'colour')
+                .addChoice('Select menu for notification roles', 'pings')
+        )
+        ,
+    async execute(client, interaction) {
+        if (interaction.options.getString('object') == "colour") {
             const pink = {value: 'rr_pink', label: 'Pink', description: 'Get the pink role colour', emoji: '897544182959333407'}
             const purple = {value: 'rr_purple', label: 'Purple', description: 'Get the purple role colour', emoji: '897544182908985354'}
             const blue = {value: 'rr_blue', label: 'Blue', description: 'Get the blue role colour', emoji: '897544182938353684'}
@@ -23,7 +37,7 @@ module.exports.run = async (client, message, args) => {
             const lightyellow = {value: 'rr_lightyellow', label: 'Light Yellow', description: 'Get the light yellow role colour', emoji: '897544182854463528'}
             const lightred = {value: 'rr_lightred', label: 'Light Red', description: 'Get the light red role colour', emoji: '897544183013855293'}
 
-            const menu = new MessageSelectMenu()
+            const menu = new Discord.MessageSelectMenu()
                 .setPlaceholder("Select a colour role.")
                 .setCustomId("reactionroles")
                 .addOptions([pink, purple, blue, aqua, green, yellow, orange, red, lightpink, lightpurple, lightblue, ultralightblue, lightaqua, lightgreen, lightyellow, lightred])
@@ -31,12 +45,13 @@ module.exports.run = async (client, message, args) => {
                 .setMinValues(0)
             const row = new Discord.MessageActionRow()
                 .addComponents(menu)
-            message.channel.send({content: "​", components: [row]}) //ZERO-WIDTH SPACE
-        } else if (args[0] == "rr_pings") {
+            interaction.channel.send({content: "​", components: [row]}) //ZERO-WIDTH SPACE
+            interaction.reply({content: "Object summoned successfully.", ephemeral: true})
+        } else if (interaction.options.getString('object') == "pings") {
             const updatePings = {value: 'rr_updates', label: 'Updates and announcements', description: 'Recieve a ping for important updates and announcements.', emoji: '📣'}
             const giveawayPings = {value: 'rr_giveaways', label: 'Giveaways', description: 'Recieve a ping for giveaways.', emoji: '🎉'}
             const lookingForParty = {value: 'rr_lfp', label: 'Looking for party', description: 'Get pinged by other players when they are looking for a party.', emoji: '797755651022913597'}
-            const menu = new MessageSelectMenu()
+            const menu = new Discord.MessageSelectMenu()
                 .setPlaceholder("Select a notification role")
                 .setCustomId("pingingroles")
                 .addOptions([updatePings, giveawayPings, lookingForParty])
@@ -44,7 +59,8 @@ module.exports.run = async (client, message, args) => {
                 .setMinValues(0)
             const row = new Discord.MessageActionRow()
                 .addComponents(menu)
-            message.channel.send({content: "​", components: [row]}) //ZERO-WIDTH SPACE
+            interaction.channel.send({content: "​", components: [row]}) //ZERO-WIDTH SPACE
+            interaction.reply({content: "Object summoned successfully.", ephemeral: true})
         }
-    }
-}
+    },
+};

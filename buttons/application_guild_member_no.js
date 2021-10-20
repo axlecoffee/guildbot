@@ -15,6 +15,6 @@ module.exports.run = async (client, button, config) => {
         .setAuthor(button.user.tag)
         .setThumbnail(button.user.displayAvatarURL())
         .addField('**Failed application**', '**Questions 1-3 (requirements):**\nUser anwsered **NO**.\n**Question 4 (IGN):**\nNot checked.')
-    channel = client.channels.cache.get(config.applogschannel)
+    channel = client.channels.cache.get(config.channels.appLogChannelId)
     channel.send({embeds: [logembed]})
 }
