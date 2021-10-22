@@ -8,8 +8,7 @@ const ms = require("parse-ms")
 const https = require('https')
 
 const Discord = require("discord.js")
-const { Intents, Collection } = require('discord.js')
-const allIntents = new Intents(32767); const client = new Discord.Client({ intents: allIntents }); //Uses all intents. The bot runs in a single server so it does not matter.
+const allIntents = new Discord.Intents(32767); const client = new Discord.Client({ intents: allIntents }); //Uses all intents. The bot runs in a single server so it does not matter.
 
 const config = require('./config.json')
 const wordBlackList = require('./wordBlackList.json')
@@ -33,7 +32,7 @@ client.on('ready', () => {
         guild = client.guilds.cache.find(guild => guild.id == config.guildId)
         client.user.setActivity(`over ${guild.name}`, {type: "WATCHING"})
     }
-    client.commands = new Collection();
+    client.commands = new Discord.Collection();
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {const command = require(`./commands/${file}`); client.commands.set(command.data.name, command);}
     const deployCommands = require(`./slash_commands.js`);
