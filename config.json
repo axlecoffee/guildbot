@@ -1,5 +1,5 @@
 {
-    "version":"1.2.6",
+    "version":"1.2.8",
     "guildId": "586583600464527385",
     "hypixelGuildId":"5ab117970cf201afed33a625",
     "embedcolour": {
@@ -22,5 +22,9 @@
         "guild_staff_application":"https://forms.gle/3yA9wFU3LhLcRNT3A",
         "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/"
     },
-    "supportServerInviteCode":"whGyz8ABM5"
+    "supportServerInviteCode":"whGyz8ABM5",
+    "emoji":{
+        "halloween":["🍬", "🎃", "👻", "🦇"],
+        "christmas":["🎄", "⛄", "🎁", "🍪", "❄️"]
+    }
 }

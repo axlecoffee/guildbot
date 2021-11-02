@@ -149,9 +149,7 @@ module.exports = {
                                 }
     
                             })
-                        }).on("error", (err) => {
-                            console.error(err.message);
-                        });
+                        }).on('error', (err) => {console.error(err); return interaction.reply({content: `**There was an error while executing this command!**\n*{${err}}*`, ephemeral: true})})
     
     
                     } else {
@@ -165,9 +163,7 @@ module.exports = {
                         setTimeout(() => {interaction.deleteReply()}, 15000);
                     }
                 })
-            }).on("error", (err) => {
-                console.error(err.message);
-            });
+            }).on('error', (err) => {console.error(err); return interaction.reply({content: `**There was an error while executing this command!**\n*{${err}}*`, ephemeral: true})})
         }
     },
 };

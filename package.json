@@ -1,6 +1,6 @@
 {
   "name": "guildbot",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "description": "A discord bot used by the Hypixel guild TheInfinity. Contains features that help with connecting the discord server with the minecraft guild and Hypixel. Uses new elements from the discord API like buttons and dropdown menus.",
   "main": "server.js",
   "scripts": {
@@ -11,6 +11,7 @@
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0",
+    "node-schedule": "^2.0.0",
     "parse-ms": "^2.1.0",
     "stormdb": "^0.4.1"
   },

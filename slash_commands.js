@@ -15,20 +15,18 @@ module.exports.deploy = async (client, clientId, guildId) => {
     
     const rest = new REST({ version: '9' }).setToken(token);
     
-    rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
-        .then(() => console.log('Successfully registered application commands.'))
-        .catch(console.error);
-    
-    for (const file of commandFiles) {
-        const command = require(`./commands/${file}`);
-        if (command.permissions) {
-            commandPermissions = command.permissions
-            commandData = command.data.toJSON()
-            let guild = await client.guilds.cache.get(guildId)
-            guild.commands.fetch().then(commands => {
-                let guildCommand = commands.find(command => command.name == commandData.name)
-                guildCommand.permissions.set({ permissions: commandPermissions })
-            })
+    rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands }).then(async () => {
+        console.log('Successfully registered application commands.')
+        for (const file of commandFiles) {
+            const command = require(`./commands/${file}`);
+            if (command.permissions) {
+                let guild = await client.guilds.cache.get(guildId)
+                guild.commands.fetch().then(commands => {
+                    let guildCommand = commands.find(cmd => cmd.name == command.data.name)
+                    guildCommand.permissions.set({ permissions: command.permissions })
+                })
+            }
         }
-    }
+        console.log("Applied command permissions.")
+    }).catch(console.error);
 }

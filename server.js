@@ -6,6 +6,7 @@ const fs = require('fs');
 const db = require("./stormdb.js")
 const ms = require("parse-ms")
 const https = require('https')
+const schedule = require('node-schedule');
 
 const Discord = require("discord.js")
 const allIntents = new Discord.Intents(32767); const client = new Discord.Client({ intents: allIntents }); //Uses all intents. The bot runs in a single server so it does not matter.
@@ -21,6 +22,8 @@ client.on('error', async (err) => {
         .addField('**Cause: **', `\`\`${err.message}\`\``)
     channel.send({embeds:[embed]})
 })
+
+//client.on('debug', async (debug) => {console.log(debug)}) //Uncomment for debugging.
 
 //Send login message and setup bot activity; Register slash commands
 client.on('ready', () => {
@@ -81,11 +84,22 @@ client.on('interactionCreate', async (interaction) => {
     } else if (interaction.isCommand()) {
         const command = client.commands.get(interaction.commandName);
         if (!command) return;
+        let now = Date.now()
+        if (command.cooldown) {
+            let nextAvailable = db.get(`commandCooldown`).get(`${command.data.name}`).value()
+            if (nextAvailable==undefined) nextAvailable=0;
+            if (nextAvailable-now>0) {
+                return interaction.reply({ content: `**Command on cooldown! Please wait *${(nextAvailable-now)/1000}* more seconds.**`, ephemeral: true });
+            }
+        }
         try {
             await command.execute(client, interaction);
+            if (command.cooldown) {
+                db.set(`commandCooldown.${command.data.name}`, (now+command.cooldown)).save()
+            }
         } catch (error) {
             console.error(error);
-            return interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            return interaction.reply({ content: '**There was an error while executing this command!**\n*No more info is available.*', ephemeral: true });
         }
     }
 });
@@ -120,3 +134,48 @@ client.on('channelCreate', (channel) => {
 })
 
 client.login(process.env.TOKEN)
+
+const job = schedule.scheduleJob('*/5 * * * *', function(){
+    https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {
+                let leaderboardData = {};
+                let data = "";
+                let hGuild = {}
+                res.on('data', data_chunk => {
+                    data += data_chunk;
+                })
+                res.on('end', async () => {
+                    hGuild = JSON.parse(data)
+                    if (hGuild.success) {
+                        for (const member of hGuild.guild.members) {
+                            https.get(`https://sessionserver.mojang.com/session/minecraft/profile/${member.uuid}`, (memberdata) => {
+                                let mojangdata = "";
+                                memberdata.on('data', data_chunk => {
+                                    mojangdata += data_chunk;
+                                })
+                                memberdata.on('end', () => {
+                                    mun = JSON.parse(mojangdata)
+                                    dates = Object.keys(member.expHistory)
+                                    let avgExp = 0; let totalExp = 0; let c = 0;
+                                    dates.forEach((date) => {
+                                        avgExp+=member.expHistory[date]
+                                        c+=1;
+                                    })
+                                    totalExp = avgExp;
+                                    avgExp/=c;
+                                    leaderboardData[mun.name.toString()] = {avg: avgExp, total: totalExp}
+                                })
+                            }).on("error", (err) => {
+                                return console.error(err);
+                            })
+                        }
+                        setTimeout(() => {
+                            db.set(`guildApiData.leaderBoardData`, leaderboardData).save()
+                        },5000)
+                    } else {
+                        console.error(hGuild)
+                    }
+                })
+            }).on("error", (err) => {
+                return console.error(err);
+            })
+});
