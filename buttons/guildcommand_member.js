@@ -12,7 +12,8 @@ module.exports.run = async (client, button, config) => {
             data += data_chunk;
         })
         res.on('end', () => {
-            hGuild = JSON.parse(data)
+            hGuild; 
+            try{hGuild = JSON.parse(data)}catch(err){console.error(err)}
             if (hGuild.success) {
                 hGuild.guild.members.forEach(member => {
                     if (member.uuid != passedData.uuid) return;

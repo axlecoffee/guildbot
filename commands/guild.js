@@ -44,7 +44,8 @@ module.exports = {
             })
             https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {
                 let data = "";
-                let hGuild;
+                hGuild; 
+                try{hGuild = JSON.parse(data)}catch(err){console.error(err)}
                 res.on('data', data_chunk => {
                     data += data_chunk;
                 })
@@ -123,9 +124,9 @@ module.exports = {
                 })
             }).on('error', (err) => {console.error(err); return interaction.reply({content: `**There was an error while executing this command!**\n*{${err}}*`, ephemeral: true})})
         } else if (interaction.options.getSubcommand() == 'leaderboard') {
-            //fetch from db - updates every 5 min
-            let leaderboardData = db.get(`guildApiData`).get(`leaderBoardData`).value()
-            let arrData = Object.entries(leaderboardData)
+            //fetch from db - updates every 1 min
+            let leaderBoardData = db.get(`guildApiData`).get(`leaderBoardData`).value()
+            let arrData = Object.entries(leaderBoardData)
             arrData.sort(function (a, b) {
                 return b[1].total - a[1].total;
             });
@@ -133,10 +134,10 @@ module.exports = {
                 .setTimestamp()
                 .setColor(config.embedcolour.a)
                 .setTitle("Weekly guild exp leaderboard")
-                .setFooter("Data updated every 5 minutes.")
+                .setFooter("Data updated every 60 seconds.")
             for (let i = 0; i < 5; i++) {
                 let userData = arrData[i];
-                embed.addField(`**${userData[0]}**`, `Total: *${userData[1].total.toLocaleString("en")} exp*\nAverage daily: *${((Math.floor(userData[1].avg*100))/100).toLocaleString("en")} exp*`)
+                embed.addField(`**${userData[1].rankName}** ${userData[0]}`, `Total: *${userData[1].total.toLocaleString("en")} exp*\nAverage daily: *${((Math.floor(userData[1].avg*100))/100).toLocaleString("en")} exp*`)
             }
             interaction.reply({
                 embeds: [embed],

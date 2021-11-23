@@ -2,6 +2,9 @@
 //https://api.hypixel.net/player?key=${apikey}&uuid=${uuid}
 //https://api.mojang.com/users/profiles/minecraft/${username}
 
+const logging = require('./console_formatting.js')
+logging.log(); logging.warn(); logging.error(); logging.info(); //console.log('log'); console.warn('warn'); coe.nsolerror('error'); console.info('info'); //For testing
+
 const fs = require('fs');
 const db = require("./stormdb.js")
 const ms = require("parse-ms")
@@ -23,11 +26,12 @@ client.on('error', async (err) => {
     channel.send({embeds:[embed]})
 })
 
-//client.on('debug', async (debug) => {console.log(debug)}) //Uncomment for debugging.
+//client.on('debug', async (debug) => {console.info(debug)}) //Uncomment for debugging.
 
 //Send login message and setup bot activity; Register slash commands
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    db.set(`starBoardIds`, {}).save()
     if (client.user.id == "886676473019269160") {
         console.log(`Test user detected, setting presence to OFFLINE.`)
         client.user.setPresence({ status: 'invisible' })
@@ -43,7 +47,7 @@ client.on('ready', () => {
 })
 
 //Handle commands (DM COMMANDS ARE ONLY IN DMS, NORMAL COMMANDS ARE ONLY OUTSIDE OF DMS)
-client.on('messageCreate', message => {
+client.on('messageCreate', async (message) => {
     if (message.author.id != client.user.id && message.author.bot != true && message.guild.id == config.guildId) {
         let sendOff = false
         let desc = `User: <@${message.author.id}> (ID: ${message.author.id})\nMessage: \`\`${message.content}\`\`\nMatches: `
@@ -63,7 +67,6 @@ client.on('messageCreate', message => {
 })
 
 //Handle commands, buttons and select menus
-
 client.on('interactionCreate', async (interaction) => {
 	if (interaction.isButton()) {
         button = interaction;
@@ -105,13 +108,13 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 //Update the member counter channel when someone joins the server
-client.on('guildMemberAdd', (member) => {
+client.on('guildMemberAdd', async (member) => {
     if (member.guild.id == config.guildId) {
         let num = member.guild.memberCount;
         member.guild.channels.cache.get("698908097510375554").setName(`📊Members: ${num}📊`);
     }
 });
-client.on('guildMemberRemove', (member) => {
+client.on('guildMemberRemove', async (member) => {
     if (member.guild.id == config.guildId) {
         let num = member.guild.memberCount;
         member.guild.channels.cache.get("698908097510375554").setName(`📊Members: ${num}📊`);
@@ -119,7 +122,7 @@ client.on('guildMemberRemove', (member) => {
 });
 
 //Send info message one second after someone creates a ticket
-client.on('channelCreate', (channel) => {
+client.on('channelCreate', async (channel) => {
     if (channel.type == 'GUILD_TEXT' && channel.name.startsWith('ticket-')) {
         setTimeout(() => {
             channel.setParent(config.channels.ticketCategoryId, { lockPermissions: false })
@@ -133,9 +136,82 @@ client.on('channelCreate', (channel) => {
     }
 })
 
+client.on('messageReactionAdd', async (messageReaction, user) => {
+    message = messageReaction.message;
+    if (messageReaction.emoji.name == "⭐" && message.guild.id == config.guildId && message.author.id != client.user.id && messageReaction.count >= config.starboard.minimumCount) {
+        message.react(`<:GoldStar:905915895937892403>`)
+        let embed = new Discord.MessageEmbed()
+            .setAuthor(message.author.tag.toString(), message.author.displayAvatarURL())
+            .setFooter(`${messageReaction.count}⭐`)
+            .setTimestamp()
+        desc = `**[Jump to message](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id})**\n`
+        if (message.content) {desc+=message.content}
+        embed.setDescription(desc)
+        if (message.attachments) {
+            let attachment = await message.attachments.find(att => att.contentType.startsWith("image/"))
+            if (attachment) {
+                embed.setImage(attachment.url)
+            }
+        }
+            
+        let dbData = db.get(`starBoardIds`).get(`${message.id}`).value()
+        if (dbData == undefined) {
+            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+            starboard.send({embeds: [embed]}).then(async (msg) => {
+                db.set(`starBoardIds.${message.id}`, `${msg.id}`).save()
+            })
+        } else {
+            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+            try {
+                starboard.messages.fetch(dbData).then(async (message) => {
+                    message.edit({embeds: [embed]})
+                })
+            } catch (err) {
+                console.error(err)
+            }
+        }
+    }
+})
+
+client.on('messageReactionRemove', async (messageReaction, user) => {
+    message = messageReaction.message;
+    if (messageReaction.emoji.name == "⭐" && message.guild.id == config.guildId && message.author.id != client.user.id && messageReaction.count >= config.starboard.minimumCount) {
+        let embed = new Discord.MessageEmbed()
+            .setAuthor(message.author.tag.toString(), message.author.displayAvatarURL())
+            .setFooter(`${messageReaction.count}⭐`)
+            .setTimestamp()
+        desc = `**[Jump to message](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id})**\n`
+        if (message.content) {desc+=message.content}
+        embed.setDescription(desc)
+        if (message.attachments) {
+            let attachment = await message.attachments.find(att => att.contentType.startsWith("image/"))
+            if (attachment) {
+                embed.setImage(attachment.url)
+            }
+        }
+            
+        let dbData = db.get(`starBoardIds`).get(`${message.id}`).value()
+        if (dbData == undefined) {
+            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+            starboard.send({embeds: [embed]}).then(async (msg) => {
+                db.set(`starBoardIds.${message.id}`, `${msg.id}`).save()
+            })
+        } else {
+            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+            try {
+                starboard.messages.fetch(dbData).then(async (message) => {
+                    message.edit({embeds: [embed]})
+                })
+            } catch (err) {
+                console.error(err)
+            }
+        }
+    }
+})
+
 client.login(process.env.TOKEN)
 
-const job = schedule.scheduleJob('*/5 * * * *', function(){
+const job = schedule.scheduleJob('*/1 * * * *', function() {
     https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {
                 let leaderboardData = {};
                 let data = "";
@@ -144,7 +220,8 @@ const job = schedule.scheduleJob('*/5 * * * *', function(){
                     data += data_chunk;
                 })
                 res.on('end', async () => {
-                    hGuild = JSON.parse(data)
+                    hGuild; 
+                    try{hGuild = JSON.parse(data)}catch(err){console.error(err)}
                     if (hGuild.success) {
                         for (const member of hGuild.guild.members) {
                             https.get(`https://sessionserver.mojang.com/session/minecraft/profile/${member.uuid}`, (memberdata) => {
@@ -162,7 +239,19 @@ const job = schedule.scheduleJob('*/5 * * * *', function(){
                                     })
                                     totalExp = avgExp;
                                     avgExp/=c;
-                                    leaderboardData[mun.name.toString()] = {avg: avgExp, total: totalExp}
+                                    let rank;
+                                    if (member.rank == "GUILDMASTER") {
+                                        rank = {
+                                            "name": "Guild Master",
+                                            "default": false,
+                                            "tag": null,
+                                            "created": hGuild.guild.created,
+                                            "priority": 101
+                                        }
+                                    } else {
+                                        rank = hGuild.guild.ranks.find(rank => rank.name.toLowerCase() == member.rank.toLowerCase())
+                                    }
+                                    leaderboardData[mun.name.toString()] = {avg: avgExp, total: totalExp, rankName: rank.name, rankDefault: rank.default, rankTag: rank.tag, rankCreated: rank.created, rankPriority: rank.priority}
                                 })
                             }).on("error", (err) => {
                                 return console.error(err);
@@ -170,6 +259,7 @@ const job = schedule.scheduleJob('*/5 * * * *', function(){
                         }
                         setTimeout(() => {
                             db.set(`guildApiData.leaderBoardData`, leaderboardData).save()
+                            db.set(`guildApiData.leaderBoardDataTimeStamp`, Date.now()).save()
                         },5000)
                     } else {
                         console.error(hGuild)

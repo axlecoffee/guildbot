@@ -1,5 +1,5 @@
 {
-    "version":"1.2.8",
+    "version":"1.2.9",
     "guildId": "586583600464527385",
     "hypixelGuildId":"5ab117970cf201afed33a625",
     "embedcolour": {
@@ -15,12 +15,16 @@
         "logChannelId":"868074749765484574",
         "appLogChannelId":"865893055009914891",
         "queueChannelId":"885615816211595305",
-        "ticketCategoryId":"897821535639834644"
+        "ticketCategoryId":"897821535639834644",
+        "starboardChannelId":"905913384527073280"
     },
     "links":{
         "guild_membership_application":"https://forms.gle/Z22fmSgzM7Wb5F539",
         "guild_staff_application":"https://forms.gle/3yA9wFU3LhLcRNT3A",
         "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/"
+    },
+    "starboard":{
+        "minimumCount": 4
     },
     "supportServerInviteCode":"whGyz8ABM5",
     "emoji":{
