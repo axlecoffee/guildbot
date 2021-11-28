@@ -12,7 +12,7 @@
   </a>
 </p>
 
-> A discord bot used by the Hypixel guild TheInfinity. Contains features that help with connecting the discord server with the minecraft guild and Hypixel. Uses new elements from the discord API like buttons and dropdown menus.
+> Discord bot targeted at hypixel guilds. Offers automatic applications with in-game requirements, displaying guild and player info, and more.
 
 ### 🏠 [Homepage](https://github.com/MCUniversity/guildbot)
 
