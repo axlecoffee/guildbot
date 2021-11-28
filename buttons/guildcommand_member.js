@@ -17,13 +17,13 @@ module.exports.run = async (client, button, config) => {
             if (hGuild.success) {
                 hGuild.guild.members.forEach(member => {
                     if (member.uuid != passedData.uuid) return;
-                    https.get(`https://sessionserver.mojang.com/session/minecraft/profile/${passedData.uuid}`, async (memberdata) => {
-                        let mojangdata = "";
-                        memberdata.on('data', data_chunk => {
-                            mojangdata += data_chunk;
+                    https.get(`https://minecraft-api.com/api/pseudo/${member.uuid}/json`, (memberData) => {
+                        let nameData = "";
+                        memberData.on('data', data_chunk => {
+                            nameData += data_chunk;
                         })
-                        memberdata.on('end', () => {
-                            mun = JSON.parse(mojangdata)
+                        memberData.on('end', () => {
+                            mun = JSON.parse(nameData)
                             dates = Object.keys(member.expHistory)
                             let dateField = ``
                             dates.forEach((date) => {
@@ -41,7 +41,7 @@ module.exports.run = async (client, button, config) => {
                                     let embed = new Discord.MessageEmbed()
                                         .setColor(config.embedcolour.a)
                                         .setTimestamp()
-                                        .setTitle(`**${rank}** ${mun.name} - Guild member data`)
+                                        .setTitle(`**${rank}** ${mun.pseudo} - Guild member data`)
                                         .setFooter(`uuid: ${passedData.uuid}`)
                                         .addField("Rank", `${member.rank}`)
                                         .addField("Joined guild", `${new Date(member.joined)}`)

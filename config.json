@@ -1,5 +1,5 @@
 {
-    "version":"1.2.9",
+    "version":"1.3.0",
     "guildId": "586583600464527385",
     "hypixelGuildId":"5ab117970cf201afed33a625",
     "embedcolour": {
@@ -18,17 +18,22 @@
         "ticketCategoryId":"897821535639834644",
         "starboardChannelId":"905913384527073280"
     },
-    "links":{
-        "guild_membership_application":"https://forms.gle/Z22fmSgzM7Wb5F539",
+    "url":{
         "guild_staff_application":"https://forms.gle/3yA9wFU3LhLcRNT3A",
-        "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/"
+        "forums_post":"https://hypixel.net/threads/the-infinity-level-100-active-discord-server.3523718/",
+        "scamLinkBlacklist":"https://raw.githubusercontent.com/BuildBot42/discord-scam-links/main/list.txt"
     },
     "starboard":{
         "minimumCount": 4
     },
-    "supportServerInviteCode":"whGyz8ABM5",
     "emoji":{
         "halloween":["🍬", "🎃", "👻", "🦇"],
         "christmas":["🎄", "⛄", "🎁", "🍪", "❄️"]
+    },
+    "repo": {
+        "maintainer":"@MCUniversity#0859",
+        "supportServerInviteCode":"whGyz8ABM5",
+        "repoUrl":"https://github.com/MCUniversity/guildbot",
+        "repoRaw":"https://raw.githubusercontent.com/MCUniversity/guildbot/main/"
     }
 }

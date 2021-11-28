@@ -7,6 +7,7 @@ const db = require("../stormdb.js")
 const https = require('https')
 require('dotenv').config()
 const config = require('../config.json')
+const functions = require('../functions.js')
 
 module.exports.run = async (client, button) => {
     let message = button.message
@@ -85,6 +86,7 @@ module.exports.run = async (client, button) => {
                             components: [row]
                         })
                         button.member.roles.add(config.roles.guildMemberRole)
+                        functions.statistics.increaseGuildApplicationCount()
                     } else {
                         let nembed = new Discord.MessageEmbed()
                             .setColor(config.embedcolour.a)

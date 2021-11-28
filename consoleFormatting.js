@@ -93,5 +93,6 @@ module.exports = {
             }
             error.apply(console, [formatConsoleDate(new Date()) + first_parameter].concat(other_parameters));
         };
-    }
+    },
+    colours: colours
 }

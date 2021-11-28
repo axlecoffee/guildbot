@@ -44,23 +44,22 @@ module.exports = {
             })
             https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {
                 let data = "";
-                hGuild; 
-                try{hGuild = JSON.parse(data)}catch(err){console.error(err)}
+                let hGuild; 
                 res.on('data', data_chunk => {
                     data += data_chunk;
                 })
                 res.on('end', () => {
-                    hGuild = JSON.parse(data)
+                    try{hGuild = JSON.parse(data)}catch(err){console.error(err)}
                     if (hGuild.success) {
                         hGuild.guild.members.forEach(member => {
-                            https.get(`https://sessionserver.mojang.com/session/minecraft/profile/${member.uuid}`, async (memberdata) => {
-                                let mojangdata = "";
-                                memberdata.on('data', data_chunk => {
-                                    mojangdata += data_chunk;
+                            https.get(`https://minecraft-api.com/api/pseudo/${member.uuid}/json`, (memberData) => {
+                                let nameData = "";
+                                memberData.on('data', data_chunk => {
+                                    nameData += data_chunk;
                                 })
-                                memberdata.on('end', () => {
-                                    mun = JSON.parse(mojangdata)
-                                    if (mun.name == inGameName) {
+                                memberData.on('end', () => {
+                                    mun = JSON.parse(nameData)
+                                    if (mun.pseudo == inGameName) {
                                         dates = Object.keys(member.expHistory)
                                         let dateField = ``
                                         dates.forEach((date) => {
