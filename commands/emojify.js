@@ -1,26 +1,28 @@
-const {
-    SlashCommandBuilder
-} = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
 
 module.exports = {
     help: false,
     permissions: [{
-        id: "592743020609142796",
+        id: config.roles.adminRole,
         type: 1,
         permission: true
     }],
     data: new SlashCommandBuilder()
         .setName('emojify')
         .setDescription(`Change nickname prefix of all server members to an emoji.`)
-        .addStringOption(option => option
-            .setName("emoji")
-            .setDescription("Select an emoji theme or remove the emoji prefix")
-            .setRequired(true)
-            .addChoice('Clear emoji', 'clear')
-            .addChoice('Halloween emoji', 'halloween')
-        )
+        .addStringOption(option => {
+            option
+                .setName("emoji")
+                .setDescription("Select an emoji theme or remove the emoji prefix")
+                .setRequired(true)
+                .addChoice('Clear emoji', 'clear')
+            for (const key in config.emoji) {
+                option.addChoice(config.emoji[key].desc, key);
+            }
+            return option;
+        })
         .setDefaultPermission(false),
     async execute(client, interaction) {
         function getRandom(min, max) {
@@ -30,32 +32,34 @@ module.exports = {
         };
         let guild = await client.guilds.fetch(config.guildId)
         if (interaction.options.getString('emoji') == "clear") {
-            let emoji = Object.entries(config.emoji)
-            guild.members.fetch().then(async (members) => {
-                members.forEach(async (member) => {
-                    let name = member.displayName.toString()
-                    for (let i = 0;i<emoji.length;i++) {
-                        for (let j = 0;j<emoji[i][1].length;j++) {
-                            name = name.replace(emoji[i][1][j], "")
-                        }
-                    }
-                    member.setNickname(name, `Emojify command ran by ${interaction.user.tag}.`).then(async (returnedMember) => {
-                        console.log(`Applied ${name} to ${returnedMember.user.tag}.`)
-                    }).catch(err => {
-                        interaction.channel.send(`Manual correction required for ${member.user.toString()}.\n${err}`);
-                        console.error(err)
-                    })
-                })
-            })
             interaction.reply({
                 content: "Clearing emoji prefixes from all guild members. \nWarning. This action may take a long time to complete and depends on the amount of guild members and the server the bot is hosted on - In testing, the bot took 5 minutes to change nicknames for 270 guild members."
             })
-        } else if (interaction.options.getString('emoji') == "halloween") {
-            let emoji = config.emoji.halloween
-            
+            for (const key in config.emoji) {
+                let emoji = config.emoji[key].e
+                guild.members.fetch().then(async (members) => {
+                    members.forEach(async (member) => {
+                        let name = member.displayName.toString()
+                        for (let i = 0;i<emoji.length;i++) {
+                            name = name.replace(emoji[i], "")
+                        }
+                        if (name != member.displayName.toString()) {
+                            member.setNickname(name, `Emojify command ran by ${interaction.user.tag}.`).then(async (returnedMember) => {
+                                console.log(`Applied ${name} to ${returnedMember.user.tag}.`)
+                            }).catch(err => {
+                                interaction.channel.send(`Manual correction required for ${member.user.toString()}.\n${err}`);
+                                console.error(err)
+                            })
+                        }
+                    })
+                })
+            }
+        } else {
+            let selected = interaction.options.getString('emoji')
+            let emoji = config.emoji[selected].e
             guild.members.fetch().then(async (members) => {
                 members.forEach(async (member) => {
-                    let idx = getRandom(0,emoji.length)
+                    let idx = getRandom(0,emoji.length-1)
                     let preName = member.displayName.toString()
                     let name = emoji[idx] + preName
                     member.setNickname(name, `Emojify command ran by ${interaction.user.tag}. Emoji list: config.emoji.halloween`).then(async (returnedMember) => {
@@ -66,8 +70,9 @@ module.exports = {
                     })
                 })
             })
+            
             interaction.reply({
-                content: "Adding emoji prefix from list ``config.emoji.halloween`` to all guild members. \nWarning. This action may take a long time to complete and depends on the amount of guild members and the server the bot is hosted on - In testing, the bot took 5 minutes to change nicknames for 270 guild members."
+                content: `Adding emoji prefix from list \`\`config.emoji.${selected}\`\` to all guild members. \nWarning. This action may take a long time to complete and depends on the amount of guild members and the server the bot is hosted on - In testing, the bot took 5 minutes to change nicknames for 270 guild members.`
             })
         }
     },

@@ -5,7 +5,7 @@ const db = require('../stormdb.js')
 
 module.exports = {
     help: false,
-    permissions: [{id:"592743020609142796", type:1, permission:true}],
+    permissions: [{id:config.roles.adminRole, type:1, permission:true}],
     data: new SlashCommandBuilder()
         .setName('summon')
         .setDefaultPermission(false)
