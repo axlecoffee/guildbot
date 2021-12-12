@@ -126,7 +126,7 @@ module.exports.run = async (client, button) => {
                 }
             })
         }).on("error", (err) => {
-            return console.log("Error: " + err.message);
+            return console.error("Error: " + err.message);
         });
     }
 }

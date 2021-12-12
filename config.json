@@ -1,5 +1,5 @@
 {
-    "version":"1.3.1",
+    "version":"1.4.0-beta.1",
     "guildId": "586583600464527385",
     "hypixelGuildId":"5ab117970cf201afed33a625",
     "embedcolour": {
@@ -17,7 +17,11 @@
         "appLogChannelId":"865893055009914891",
         "queueChannelId":"885615816211595305",
         "ticketCategoryId":"897821535639834644",
-        "starboardChannelId":"905913384527073280"
+        "starboardChannelId":"905913384527073280",
+        "memberCount": {
+            "discord":"698908097510375554",
+            "guild":"917810366447255602"
+        }
     },
     "url":{
         "guild_staff_application":"https://forms.gle/3yA9wFU3LhLcRNT3A",

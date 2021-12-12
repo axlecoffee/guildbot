@@ -45,6 +45,14 @@ module.exports.run = async (client, button, config) => {
         .addField("Created on", `${client.user.createdAt}`)
         .setThumbnail(client.user.displayAvatarURL())
         .setFooter('Developed by @MCUniversity#0859')
+    if (!button.guild.roles.everyone.permissions.has(Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) {
+        if (!button.channel.permissionsFor(button.guild.roles.everyone).has(Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) {
+            embed.addField(':warning: External emoji could not be displayed!', 'For external emoji to be displayed properly within slash commands, the @everyone role in your server needs to have the "Use External Emoji" permission.')    
+        }
+    }
+    if (!button.channel.permissionsFor(button.guild.roles.everyone).serialize().USE_EXTERNAL_EMOJIS && button.guild.roles.everyone.permissions.has(Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) {
+        embed.addField(':warning: External emoji could not be displayed!', 'For external emoji to be displayed properly within slash commands, the @everyone role in your server needs to have the "Use External Emoji" permission.')    
+    }
     button.update({
         embeds: [embed],
         components: [row]

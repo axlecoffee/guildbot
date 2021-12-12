@@ -46,6 +46,8 @@ client.on('ready', async () => {
     const deployCommands = require(`./slashCommands.js`);
     deployCommands.deploy(client, client.user.id, config.guildId)
     functions.checkForUpdates(client)
+    functions.leaderboardDataUpdate(client)
+    functions.blacklistUpdate()
 })
 
 //Handle message blacklist
@@ -118,13 +120,13 @@ client.on('interactionCreate', async (interaction) => {
 client.on('guildMemberAdd', async (member) => {
     if (member.guild.id == config.guildId) {
         let num = member.guild.memberCount;
-        member.guild.channels.cache.get("698908097510375554").setName(`📊Members: ${num}📊`);
+        member.guild.channels.cache.get(config.channels.memberCount.discord).setName(`📊Members: ${num}📊`);
     }
 });
 client.on('guildMemberRemove', async (member) => {
     if (member.guild.id == config.guildId) {
         let num = member.guild.memberCount;
-        member.guild.channels.cache.get("698908097510375554").setName(`📊Members: ${num}📊`);
+        member.guild.channels.cache.get(config.channels.memberCount.discord).setName(`📊Members: ${num}📊`);
     }
 });
 
@@ -218,5 +220,5 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
 
 client.login(process.env.TOKEN)
 
-const leaderboardDataUpdateJob = schedule.scheduleJob('*/1 * * * *', function(){functions.leaderboardDataUpdate()});
+const leaderboardDataUpdateJob = schedule.scheduleJob('*/1 * * * *', function(){functions.leaderboardDataUpdate(client)});
 const blacklistUpdateJob = schedule.scheduleJob('*/30 * * * *', function(){functions.blacklistUpdate()});

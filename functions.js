@@ -55,7 +55,7 @@ module.exports = {
             })
         })
     },
-    async leaderboardDataUpdate(){
+    async leaderboardDataUpdate(client){
         https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {
             let leaderboardData = {};
             let data = "";
@@ -71,6 +71,9 @@ module.exports = {
                     console.error(err)
                 }
                 if (hGuild.success) {
+                    let count = hGuild.guild.members.length
+                    let channel = await client.channels.fetch(config.channels.memberCount.guild)
+                    channel.setName(`📊Guild Members: ${count}📊`)
                     for (const member of hGuild.guild.members) {
                         https.get(`https://minecraft-api.com/api/pseudo/${member.uuid}/json`, (memberdata) => {
                             let nameData = "";
