@@ -1,6 +1,7 @@
 const Discord = require('discord.js')
+const config = require('../config.json')
 
-module.exports.run = async (client, button, config) => {
+module.exports.run = async (client, button) => {
     let message = button.message
     let embed = new Discord.MessageEmbed()
             .setColor(config.embedcolour.a)

@@ -2,7 +2,7 @@ const Discord = require('discord.js')
 const https = require('https')
 const config = require('../config.json')
 
-module.exports.run = async (client, button, config) => {
+module.exports.run = async (client, button) => {
     let message = button.message
     let passedData = JSON.parse((message.content).replace("||", "").replace("||", ""))
     https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {

@@ -3,7 +3,7 @@ const https = require('https')
 require('dotenv').config()
 const config = require('../config.json')
 
-module.exports.run = async (client, button, config) => {
+module.exports.run = async (client, button) => {
     let message = button.message
     let passedData = JSON.parse((message.content).replace("||", "").replace("||", ""))
     https.get(`https://api.hypixel.net/player?key=${process.env.APIKEY}&uuid=${passedData.uuid}`, (res) => {
