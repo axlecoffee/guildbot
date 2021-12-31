@@ -144,21 +144,6 @@ module.exports = {
             return console.error(err);
         })
     },
-    async blacklistUpdate(){
-        let url = config.url.scamLinkBlacklist
-        https.get(url, (res) => {
-            let data = "";
-            res.on('data', data_chunk => {
-                data += data_chunk;
-            })
-            res.on('end', async () => {
-                let newBlacklist = data.split("\n").filter(e=>e)
-                fs.writeFile('wordBlackList.json', JSON.stringify(newBlacklist), (err) => {
-                    if (err) return console.error(err)
-                })
-            })
-        })
-    },
     statistics: {
         async increaseButtonCount() {
             await MongoClient.connect()

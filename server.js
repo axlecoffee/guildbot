@@ -11,7 +11,6 @@ const Discord = require("discord.js")
 const allIntents = new Discord.Intents(32767); const client = new Discord.Client({ intents: allIntents }); //Uses all intents. The bot runs in a single server so it does not matter.
 
 const config = require('./config.json')
-const wordBlackList = require('./wordBlackList.json');
 
 client.on('error', async (err) => {
     const channel = await client.channels.cache.get(config.channels.logChannelId)
@@ -48,29 +47,6 @@ client.on('ready', async () => {
     deployCommands.deploy(client, client.user.id, config.guildId)
     functions.checkForUpdates(client)
     functions.leaderboardDataUpdate(client)
-    functions.blacklistUpdate()
-})
-
-//Handle message blacklist
-client.on('messageCreate', async (message) => {
-    if (message.author.id != client.user.id && message.author.bot != true && message.guild.id == config.guildId) {
-        let sendOff = false
-        let desc = `User: <@${message.author.id}> (ID: ${message.author.id})\nMessage: \`\`${message.content}\`\`\nMatches: `
-        for (let i = 0;i<wordBlackList.length;i++) {
-            let link = wordBlackList[i]
-            if (link[link.length-1] != '/') link+='/'
-            if (message.content.includes(link)) {
-                sendOff = true;
-                desc+=`\`\`${wordBlackList[i]}\`\` `;
-            }
-        }
-        if (sendOff == true) {
-            let embed = new Discord.MessageEmbed().setColor('RED').setTimestamp().setTitle("<:warning_emoji:868054485992357948> Message deleted due to match from word blacklist.").setDescription(desc)
-            message.delete()
-            let logchannel = client.channels.cache.get(config.channels.logChannelId)
-            return logchannel.send({embeds: [embed]})
-        }
-    }
 })
 
 //Handle commands, buttons and select menus
@@ -287,4 +263,3 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
 client.login(process.env.TOKEN)
 
 const leaderboardDataUpdateJob = schedule.scheduleJob('*/1 * * * *', function(){functions.leaderboardDataUpdate(client)});
-const blacklistUpdateJob = schedule.scheduleJob('*/30 * * * *', function(){functions.blacklistUpdate()});
