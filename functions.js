@@ -1,5 +1,7 @@
+require('dotenv').config()
 const https = require('https')
-const db = require('./stormdb.js')
+const mongo = require('mongodb')
+const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const config = require('./config.json')
 const os = require('os')
 const fs = require('fs')
@@ -118,9 +120,21 @@ module.exports = {
                             return console.error(err);
                         })
                     }
-                    setTimeout(() => {
-                        db.set(`guildApiData.leaderBoardData`, leaderboardData).save()
-                        db.set(`guildApiData.leaderBoardDataTimeStamp`, Date.now()).save()
+                    setTimeout(async () => {
+                        await MongoClient.connect()
+                        const db = await MongoClient.db()
+                        await db.collection('hypixel-api-data').findOne({ sid: "guild-leaderboard-data" }, async function(err, res) {
+                            if (err) throw err;
+                            if (res == null) {
+                                await db.collection('hypixel-api-data').insertOne({sid: "guild-leaderboard-data", data: leaderboardData, timestamp: Date.now()}, function(err, res) {
+                                    if (err) throw err;
+                                    MongoClient.close()
+                                })
+                            } else {
+                                await db.collection('hypixel-api-data').updateOne({ sid: "guild-leaderboard-data" }, { $set: { data: leaderboardData, timestamp: Date.now() } })
+                                MongoClient.close()
+                            }
+                        })
                     }, 5000)
                 } else {
                     console.error(hGuild)
@@ -147,20 +161,68 @@ module.exports = {
     },
     statistics: {
         async increaseButtonCount() {
-            let count = db.get(`stat`).get(`countButtons`).value()
-            db.set(`stat.countButtons`, count+1).save()
+            await MongoClient.connect()
+            const db = await MongoClient.db()
+            await db.collection('statistics').findOne({ sid: "countButtons" }, async function(err, res) {
+                if (err) throw err;
+                if (res == null) {
+                    await db.collection('statistics').insertOne({sid: "countButtons", value: 1}, function(err, res) {
+                        if (err) throw err;
+                        MongoClient.close()
+                    })
+                } else {
+                    await db.collection('statistics').updateOne({ sid: "countButtons" }, { $set: { value: res.value+1 } })
+                    MongoClient.close()
+                }
+            })
         },
         async increaseCommandCount() {
-            let count = db.get(`stat`).get(`countCommands`).value()
-            db.set(`stat.countCommands`, count+1).save()
+            await MongoClient.connect()
+            const db = await MongoClient.db()
+            await db.collection('statistics').findOne({ sid: "countCommands" }, async function(err, res) {
+                if (err) throw err;
+                if (res == null) {
+                    await db.collection('statistics').insertOne({sid: "countCommands", value: 1}, function(err, res) {
+                        if (err) throw err;
+                        MongoClient.close()
+                    })
+                } else {
+                    await db.collection('statistics').updateOne({ sid: "countCommands" }, { $set: { value: res.value+1 } })
+                    MongoClient.close()
+                }
+            })
         },
         async increaseSelectMenuCount() {
-            let count = db.get(`stat`).get(`countSelectMenu`).value()
-            db.set(`stat.countSelectMenu`, count+1).save()
+            await MongoClient.connect()
+            const db = await MongoClient.db()
+            await db.collection('statistics').findOne({ sid: "countSelectMenu" }, async function(err, res) {
+                if (err) throw err;
+                if (res == null) {
+                    await db.collection('statistics').insertOne({sid: "countSelectMenu", value: 1}, function(err, res) {
+                        if (err) throw err;
+                        MongoClient.close()
+                    })
+                } else {
+                    await db.collection('statistics').updateOne({ sid: "countSelectMenu" }, { $set: { value: res.value+1 } })
+                    MongoClient.close()
+                }
+            })
         },
         async increaseGuildApplicationCount() {
-            let count = db.get(`stat`).get(`countGuildApplications`).value()
-            db.set(`stat.countGuildApplications`, count+1).save()
+            await MongoClient.connect()
+            const db = await MongoClient.db()
+            await db.collection('statistics').findOne({ sid: "countGuildApplications" }, async function(err, res) {
+                if (err) throw err;
+                if (res == null) {
+                    await db.collection('statistics').insertOne({sid: "countGuildApplications", value: 1}, function(err, res) {
+                        if (err) throw err;
+                        MongoClient.close()
+                    })
+                } else {
+                    await db.collection('statistics').updateOne({ sid: "countGuildApplications" }, { $set: { value: res.value+1 } })
+                    MongoClient.close()
+                }
+            })
         }
     }
 }

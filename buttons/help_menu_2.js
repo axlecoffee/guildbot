@@ -1,7 +1,8 @@
 const Discord = require('discord.js')
 const {MessageButton,MessageActionRow} = require('discord.js');
+const config = require('../config.json')
 
-module.exports.run = async (client, button, config) => {
+module.exports.run = async (client, button) => {
     let buttonFoward = new MessageButton()
         .setStyle(2)
         .setEmoji('▶️')

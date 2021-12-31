@@ -3,7 +3,8 @@ const Discord = require('discord.js')
 const config = require('../config.json')
 const https = require('https')
 require('dotenv').config()
-const db = require('../stormdb.js')
+const mongo = require('mongodb')
+const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
 module.exports = {
     help: true,
@@ -36,27 +37,33 @@ module.exports = {
         ,
     async execute(client, interaction) {
         if (interaction.options.getSubcommand() == 'check') {
+            await MongoClient.connect()
+            const db = MongoClient.db()
             let user = interaction.options.getUser('user')
-            let userData;
-            if (db.get(`accountLinks`).get(`${user.id}`).value() == undefined) {
-                userData = undefined;
-            } else {
-                userData = db.get(`accountLinks`).get(`${user.id}`).get(`name`).value()
-            }
-            let embed = new Discord.MessageEmbed()
-                .setColor(config.embedcolour.a)
-                .setTimestamp()
-                .setTitle(`${user.username}#${user.discriminator}`)
-            if (userData == undefined) {
-                embed.addField("This account is NOT linked!", `To link a minecraft account to a discord account, use the **/link update** command.`)
-            } else {
-                embed.addField("This account is linked!", `**Minecraft account:** ${userData}`)
-            }
-            interaction.reply({
-                embeds: [embed],
-                allowedMentions: {
-                    repliedUser: false
+            db.collection('minecraft-accounts').findOne({ discord_id: user.id },function(err, res){
+                if (err) throw err;
+                let userData;
+                if (res == undefined) {
+                    userData = undefined;
+                } else {
+                    userData = res.minecraft_name;
                 }
+                let embed = new Discord.MessageEmbed()
+                    .setColor(config.embedcolour.a)
+                    .setTimestamp()
+                    .setTitle(`${user.username}#${user.discriminator}`)
+                if (userData == undefined) {
+                    embed.addField("This account is NOT linked!", `To link a minecraft account to a discord account, use the **/link update** command.`)
+                } else {
+                    embed.addField("This account is linked!", `**Minecraft account:** ${userData}`)
+                }
+                interaction.reply({
+                    embeds: [embed],
+                    allowedMentions: {
+                        repliedUser: false
+                    }
+                })
+                MongoClient.close()
             })
         } else if (interaction.options.getSubcommand() == 'tutorial') {
             interaction.reply({
@@ -91,10 +98,20 @@ module.exports = {
                                     if (socialmediadata) {
                                         let discord = data.player.socialMedia.links.DISCORD
                                         if (discord == interaction.user.tag) {
-                                            db.set(`accountLinks.${interaction.user.id}`, {
-                                                name: uuid_data.name,
-                                                uuid: uuid_data.id
-                                            }).save();
+                                            await MongoClient.connect()
+                                            const db = MongoClient.db()
+                                            db.collection('minecraft-accounts').findOne({ discord_id: interaction.user.id }, async function(err, res) {
+                                                if (err) throw err;
+                                                if (res == null) {
+                                                    await db.collection('minecraft-accounts').insertOne({discord_id: interaction.user.id, minecraft_name: uuid_data.name, minecraft_uuid: uuid_data.id}, function(err, res) {
+                                                        if (err) throw err;
+                                                        MongoClient.close()
+                                                    })
+                                                } else {
+                                                    await db.collection('minecraft-accounts').updateOne({ discord_id: interaction.user.id }, { $set: { minecraft_name: uuid_data.name, minecraft_uuid: uuid_data.id } })
+                                                    MongoClient.close()
+                                                }
+                                            })
                                             let logembed = new Discord.MessageEmbed()
                                                 .setColor(config.embedcolour.b)
                                                 .setTimestamp()

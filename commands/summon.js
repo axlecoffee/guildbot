@@ -1,7 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
-const db = require('../stormdb.js')
+const mongo = require('mongodb')
+const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
 module.exports = {
     help: false,
@@ -84,31 +85,43 @@ module.exports = {
             }
         } else if (interaction.options.getSubcommand() == 'kickwave') {
             //Calculate players who contributed the least in the last 7 days.
-            let lastUpdateTimestamp = db.get('guildApiData').get('leaderBoardDataTimeStamp').value()
-            let nowTimestamp = Date.now()
-            let totalSeconds = ((nowTimestamp-lastUpdateTimestamp) / 1000);
-            totalSeconds %= 86400; totalSeconds %= 3600;
-            let minutes = Math.floor(totalSeconds / 60);
-            let seconds = Math.floor(totalSeconds % 60);
-            let embed = new Discord.MessageEmbed()
-                .setTitle(`Kickwave calculation`)
-                .setColor(config.embedcolour.b)
-                .setFooter(`Leaderboard data last updated ${minutes}min ${seconds}sec ago.`)
-            content = "```json\n[\n"
-            let leaderBoardData = db.get(`guildApiData`).get(`leaderBoardData`).value()
-            let arrData = Object.entries(leaderBoardData)
-            arrData.sort(function (a, b) {
-                return a[1].total - b[1].total;
-            });
-            let count = interaction.options.getInteger('count')
-            if (count > 25) {count = 25};
-            for (let i = 0;i<count;i++) {
-                let userData = arrData[i];
-                embed.addField(`**${userData[1].rankName}** - *${userData[0]}*`, `Total: *${userData[1].total.toLocaleString("en")} exp*\nAverage daily: *${((Math.floor(userData[1].avg*100))/100).toLocaleString("en")} exp*`, true)
-                if (i+1<count) {content+=`"${userData[0]}",\n`} else {content+=`"${userData[0]}"\n]`}
-            }
-            content+="\n```"
-            interaction.reply({ephemeral: interaction.options.getBoolean('ephemeral'), embeds: [embed], content: content})
+            await MongoClient.connect()
+            const db = MongoClient.db()
+            db.collection('hypixel-api-data').findOne({ sid: "guild-leaderboard-data" }, async function(err, res) {
+                if (err) throw err;
+                if (res == null) {
+                    interaction.reply({content:"You can't do this now. Please try again later.", ephemeral: true})
+                    MongoClient.close()
+                } else {
+                    let lastUpdateTimestamp = res.timestamp;
+                    let nowTimestamp = Date.now()
+                    let totalSeconds = ((nowTimestamp-lastUpdateTimestamp) / 1000);
+                    totalSeconds %= 86400; totalSeconds %= 3600;
+                    let minutes = Math.floor(totalSeconds / 60);
+                    let seconds = Math.floor(totalSeconds % 60);
+                    let embed = new Discord.MessageEmbed()
+                        .setTitle(`Kickwave calculation`)
+                        .setColor(config.embedcolour.b)
+                        .setFooter(`Leaderboard data last updated ${minutes}min ${seconds}sec ago.`)
+                    content = "```json\n[\n"
+                    let leaderBoardData = res.data
+                    let arrData = Object.entries(leaderBoardData)
+                    arrData.sort(function (a, b) {
+                        return a[1].total - b[1].total;
+                    });
+                    let count = interaction.options.getInteger('count')
+                    if (count > 25) {count = 25};
+                    for (let i = 0;i<count;i++) {
+                        let userData = arrData[i];
+                        embed.addField(`**${userData[1].rankName}** - *${userData[0]}*`, `Total: *${userData[1].total.toLocaleString("en")} exp*\nAverage daily: *${((Math.floor(userData[1].avg*100))/100).toLocaleString("en")} exp*`, true)
+                        if (i+1<count) {content+=`"${userData[0]}",\n`} else {content+=`"${userData[0]}"\n]`}
+                    }
+                    content+="\n```"
+                    interaction.reply({ephemeral: interaction.options.getBoolean('ephemeral'), embeds: [embed], content: content}).then(()=>{
+                        MongoClient.close()
+                    })
+                }    
+            })
         }
     },
 };

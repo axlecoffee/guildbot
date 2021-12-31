@@ -1,14 +1,9 @@
-//Slash commands + admin perms ---> https://discord.com/api/oauth2/authorize?client_id=666672279828299804&permissions=8&scope=bot%20applications.commands
-//https://api.hypixel.net/player?key=${apikey}&uuid=${uuid}
-//https://api.mojang.com/users/profiles/minecraft/${username}
-
-const logging = require('./consoleFormatting.js')
-logging.log(); logging.warn(); logging.error(); logging.info(); //console.log('log'); console.warn('warn'); console.error('error'); console.info('info'); //For testing
-
+require('dotenv').config()
+const logging = require('./consoleFormatting.js'); logging.log(); logging.warn(); logging.error(); logging.info(); //console.log('log'); console.warn('warn'); console.error('error'); console.info('info'); //For testing
 const fs = require('fs');
-const db = require("./stormdb.js")
+const mongo = require('mongodb')
+const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const functions = require('./functions.js')
-const ms = require("parse-ms")
 const https = require('https')
 const schedule = require('node-schedule');
 
@@ -16,8 +11,7 @@ const Discord = require("discord.js")
 const allIntents = new Discord.Intents(32767); const client = new Discord.Client({ intents: allIntents }); //Uses all intents. The bot runs in a single server so it does not matter.
 
 const config = require('./config.json')
-const wordBlackList = require('./wordBlackList.json')
-require('dotenv').config()
+const wordBlackList = require('./wordBlackList.json');
 
 client.on('error', async (err) => {
     const channel = await client.channels.cache.get(config.channels.logChannelId)
@@ -32,7 +26,14 @@ client.on('error', async (err) => {
 //Send login message and setup bot activity; Register slash commands
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    db.set(`starBoardIds`, {}).save()
+    MongoClient.connect();
+    const db = MongoClient.db();
+    db.collection('starboard').findOne({}, async function (err, res) {
+        if (err) throw err;
+        if (res != undefined) {
+            db.collection('starboard').drop().then(() => MongoClient.close()) //Drop starboard collection if it exists, as all the data is unusable after the bot restarts.
+        }
+    })
     if (client.user.id == "886676473019269160") {
         console.log(`Test user detected, setting presence to OFFLINE.`)
         client.user.setPresence({ status: 'invisible' })
@@ -79,7 +80,7 @@ client.on('interactionCreate', async (interaction) => {
         button = interaction;
         try {
             let buttonFile = require(`./buttons/${button.customId}.js`);
-            buttonFile.run(client, button, config)
+            buttonFile.run(client, button)
         } catch (err) {
             return console.log(err);
         }
@@ -88,30 +89,79 @@ client.on('interactionCreate', async (interaction) => {
         menu = interaction;
         try {
             let menuFile = require(`./menu/${menu.customId}.js`);
-            menuFile.run(client, menu, config)
+            menuFile.run(client, menu)
         } catch (err) {
             return console.log(err);
         }
     } else if (interaction.isCommand()) {
+        functions.statistics.increaseCommandCount()
         const command = client.commands.get(interaction.commandName);
         if (!command) return;
         let now = Date.now()
-        if (command.cooldown) {
-            let nextAvailable = db.get(`commandCooldown`).get(`${command.data.name}`).value()
-            if (nextAvailable==undefined) nextAvailable=0;
-            if (nextAvailable-now>0) {
-                return interaction.reply({ content: `**Command on cooldown! Please wait *${(nextAvailable-now)/1000}* more seconds.**`, ephemeral: true });
-            }
+        const qfilter = {
+            guildid: interaction.guild.id,
+            command: interaction.commandName
         }
-        functions.statistics.increaseCommandCount()
-        try {
-            await command.execute(client, interaction);
-            if (command.cooldown) {
-                db.set(`commandCooldown.${command.data.name}`, (now+command.cooldown)).save()
+        if (command.cooldown) {
+            await MongoClient.connect()
+            const db = MongoClient.db()
+            await db.collection('cooldown').findOne(qfilter, async function (err, res) {
+                if (err) throw err;
+                let nextAvailable;
+                if (res != null) {
+                    nextAvailable = res.value;
+                }
+                if (nextAvailable == undefined) nextAvailable = 0;
+                if (nextAvailable - now > 0) {
+                    await interaction.reply({
+                        content: `**Command on cooldown! Please wait *${(nextAvailable-now)/1000}* more seconds.**`,
+                        ephemeral: true
+                    });
+                } else {
+                    try {
+                        await command.execute(client, interaction);
+                        const db = MongoClient.db()
+                        db.collection('cooldown').findOne(qfilter, async function (err, res) {
+                            if (err) throw err;
+                            if (res == null) {
+                                db.collection('cooldown').insertOne({
+                                    guildid: interaction.guild.id,
+                                    command: interaction.commandName,
+                                    value: now + command.cooldown
+                                }, function (err, res) {
+                                    if (err) throw err;
+                                    MongoClient.close()
+                                    return;
+                                })
+                            } else {
+                                await db.collection('cooldown').updateOne(qfilter, {
+                                    $set: {
+                                        value: now + command.cooldown
+                                    }
+                                })
+                                MongoClient.close()
+                                return;
+                            }
+                        })        
+                    } catch (error) {
+                        console.error(error);
+                        return interaction.reply({
+                            content: '**There was an error while executing this command!**\n*No more info is available.*',
+                            ephemeral: true
+                        });
+                    }
+                }
+            })
+        } else {
+            try {
+                await command.execute(client, interaction);
+            } catch (error) {
+                console.error(error);
+                return interaction.reply({
+                    content: '**There was an error while executing this command!**\n*No more info is available.*',
+                    ephemeral: true
+                });
             }
-        } catch (error) {
-            console.error(error);
-            return interaction.reply({ content: '**There was an error while executing this command!**\n*No more info is available.*', ephemeral: true });
         }
     }
 });
@@ -162,23 +212,30 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
                 embed.setImage(attachment.url)
             }
         }
-            
-        let dbData = db.get(`starBoardIds`).get(`${message.id}`).value()
-        if (dbData == undefined) {
-            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
-            starboard.send({embeds: [embed]}).then(async (msg) => {
-                db.set(`starBoardIds.${message.id}`, `${msg.id}`).save()
-            })
-        } else {
-            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
-            try {
-                starboard.messages.fetch(dbData).then(async (message) => {
-                    message.edit({embeds: [embed]})
+        await MongoClient.connect()
+        const db = MongoClient.db()
+        let qfilter = {messageid: message.id}
+        db.collection('starboard').findOne(qfilter, async function (err, res) {
+            if (res == undefined) {
+                let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+                starboard.send({embeds: [embed]}).then(async (msg) => {
+                    db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
+                        if (err) throw err;
+                        MongoClient.close()
+                    })
                 })
-            } catch (err) {
-                console.error(err)
+            } else {
+                let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+                try {
+                    starboard.messages.fetch(res.starboardid).then(async (message) => {
+                        message.edit({embeds: [embed]})
+                    })
+                } catch (err) {
+                    console.error(err)
+                }
+                MongoClient.close()
             }
-        }
+        })
     }
 })
 
@@ -198,25 +255,34 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
                 embed.setImage(attachment.url)
             }
         }
-            
-        let dbData = db.get(`starBoardIds`).get(`${message.id}`).value()
-        if (dbData == undefined) {
-            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
-            starboard.send({embeds: [embed]}).then(async (msg) => {
-                db.set(`starBoardIds.${message.id}`, `${msg.id}`).save()
-            })
-        } else {
-            let starboard = await client.channels.fetch(config.channels.starboardChannelId)
-            try {
-                starboard.messages.fetch(dbData).then(async (message) => {
-                    message.edit({embeds: [embed]})
+        await MongoClient.connect()
+        const db = MongoClient.db()
+        let qfilter = {messageid: message.id}
+        db.collection('starboard').findOne(qfilter, async function (err, res) {
+            if (err) throw err;
+            if (res == undefined) {
+                let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+                starboard.send({embeds: [embed]}).then(async (msg) => {
+                    db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
+                        if (err) throw err;
+                        MongoClient.close()
+                    })
                 })
-            } catch (err) {
-                console.error(err)
+            } else {
+                let starboard = await client.channels.fetch(config.channels.starboardChannelId)
+                try {
+                    starboard.messages.fetch(res.starboardid).then(async (message) => {
+                        message.edit({embeds: [embed]})
+                    })
+                } catch (err) {
+                    console.error(err)
+                }
+                MongoClient.close()
             }
-        }
+        })
     }
 })
+
 
 client.login(process.env.TOKEN)
 

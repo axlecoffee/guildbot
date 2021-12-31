@@ -11,9 +11,8 @@
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0",
-    "node-schedule": "^2.0.0",
-    "parse-ms": "^2.1.0",
-    "stormdb": "^0.4.1"
+    "mongodb": "^4.2.2",
+    "node-schedule": "^2.0.0"
   },
   "engines": {
     "node": "16.x"
