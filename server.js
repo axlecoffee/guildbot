@@ -274,4 +274,4 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
 
 client.login(process.env.TOKEN)
 
-const leaderboardDataUpdateJob = schedule.scheduleJob('*/1 * * * *', function(){functions.leaderboardDataUpdate(client)});
+const leaderboardDataUpdateJob = schedule.scheduleJob(config.scheduledEvents.leaderboardDataUpdate, function(){functions.leaderboardDataUpdate(client)});

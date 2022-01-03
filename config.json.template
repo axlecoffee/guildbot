@@ -1,0 +1,45 @@
+{
+    "guildId": "DISCORDID",
+    "hypixelGuildId":"UUID",
+    "embedcolour": {
+        "a":"1EC45B",
+        "b":"00AA00",
+        "c":"0075FC"
+    },
+    "roles":{
+        "guildMemberRole":"DISCORDID",
+        "helpers":["DISCORDID", "DISCORDID"],
+        "adminRole":"DISCORDID"
+    },
+    "scheduledEvents": {
+        "leaderboardDataUpdate":"*/1 * * * *"
+    },
+    "channels":{
+        "logChannelId":"DISCORDID",
+        "appLogChannelId":"DISCORDID",
+        "queueChannelId":"DISCORDID",
+        "ticketCategoryId":"DISCORDID",
+        "starboardChannelId":"DISCORDID",
+        "memberCount": {
+            "discord":"DISCORDID",
+            "guild":"DISCORDID"
+        }
+    },
+    "url":{
+        "guild_staff_application":"URL",
+        "forums_post":"URL"
+    },
+    "starboard":{
+        "minimumCount": 4
+    },
+    "emoji":{
+        "halloween":{"e": ["🍬", "🎃", "👻", "🦇"], "desc":"Halloween emoji"},
+        "christmas":{"e": ["🎄", "⛄", "🎁", "🍪"], "desc":"Christmas emoji"}
+    },
+    "repo": {
+        "maintainer":"@MCUniversity#0859",
+        "supportServerInviteCode":"whGyz8ABM5",
+        "repoUrl":"https://github.com/MCUniversity/guildbot",
+        "repoRaw":"https://raw.githubusercontent.com/MCUniversity/guildbot/main/"
+    }
+}

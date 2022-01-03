@@ -26,6 +26,10 @@
 npm install
 ```
 
+## Setup
+
+For instructions on how to set the bot up, check out the [SETUP.md](https://github.com/MCUniversity/guildbot/blob/master/SETUP.md) file.
+
 ## Usage
 
 ```sh
