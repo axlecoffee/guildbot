@@ -72,37 +72,41 @@ module.exports = {
                                 nameData += data_chunk;
                             })
                             memberdata.on('end', () => {
-                                mun = JSON.parse(nameData)
-                                dates = Object.keys(member.expHistory)
-                                let avgExp = 0;
-                                let totalExp = 0;
-                                let c = 0;
-                                dates.forEach((date) => {
-                                    avgExp += member.expHistory[date]
-                                    c += 1;
-                                })
-                                totalExp = avgExp;
-                                avgExp /= c;
-                                let rank;
-                                if (member.rank == "GUILDMASTER") {
-                                    rank = {
-                                        "name": "Guild Master",
-                                        "default": false,
-                                        "tag": null,
-                                        "created": hGuild.guild.created,
-                                        "priority": 101
+                                if (nameData != "Player not found !") {
+                                    mun = JSON.parse(nameData)
+                                    dates = Object.keys(member.expHistory)
+                                    let avgExp = 0;
+                                    let totalExp = 0;
+                                    let c = 0;
+                                    dates.forEach((date) => {
+                                        avgExp += member.expHistory[date]
+                                        c += 1;
+                                    })
+                                    totalExp = avgExp;
+                                    avgExp /= c;
+                                    let rank;
+                                    if (member.rank == "GUILDMASTER" || member.rank == "Guild Master") {
+                                        rank = {
+                                            "name": "Guild Master",
+                                            "default": false,
+                                            "tag": null,
+                                            "created": hGuild.guild.created,
+                                            "priority": 101
+                                        }
+                                    } else {
+                                        rank = hGuild.guild.ranks.find(rank => rank.name.toLowerCase() == member.rank.toLowerCase())
+                                    }
+                                    leaderboardData[mun.pseudo.toString()] = {
+                                        avg: avgExp,
+                                        total: totalExp,
+                                        rankName: rank.name,
+                                        rankDefault: rank.default,
+                                        rankTag: rank.tag,
+                                        rankCreated: rank.created,
+                                        rankPriority: rank.priority
                                     }
                                 } else {
-                                    rank = hGuild.guild.ranks.find(rank => rank.name.toLowerCase() == member.rank.toLowerCase())
-                                }
-                                leaderboardData[mun.pseudo.toString()] = {
-                                    avg: avgExp,
-                                    total: totalExp,
-                                    rankName: rank.name,
-                                    rankDefault: rank.default,
-                                    rankTag: rank.tag,
-                                    rankCreated: rank.created,
-                                    rankPriority: rank.priority
+                                    console.warn(`Warning! Invalid UUID encountered!\n${member.uuid}`)
                                 }
                             })
                         }).on("error", (err) => {

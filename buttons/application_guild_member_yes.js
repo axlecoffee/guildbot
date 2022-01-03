@@ -3,10 +3,10 @@ const {
     MessageButton,
     MessageActionRow
 } = require('discord.js');
+require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const https = require('https')
-require('dotenv').config()
 const config = require('../config.json')
 const functions = require('../functions.js')
 

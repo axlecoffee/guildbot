@@ -4,6 +4,7 @@ const {
     MessageActionRow
 } = require('discord.js');
 const config = require('../config.json')
+const pkg = require('../package.json')
 require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
@@ -41,7 +42,7 @@ module.exports.run = async (client, button) => {
         const embed = new Discord.MessageEmbed()
             .setColor(config.embedcolour.b)
             .setTimestamp()
-            .setTitle(`**GuildBot v${config.version}**`)
+            .setTitle(`**GuildBot v${pkg.version}**`)
             .addField("Uptime", `:clock2: ${days}d ${hours}h ${minutes}m ${seconds}s`, true)
             .addField("Servers", `:shield: ${client.guilds.cache.size}`, true)
             .addField("Channels", `:file_folder: ${client.channels.cache.size}`, true)

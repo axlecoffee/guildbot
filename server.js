@@ -25,7 +25,7 @@ client.on('error', async (err) => {
 //Send login message and setup bot activity; Register slash commands
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    MongoClient.connect();
+    await MongoClient.connect();
     const db = MongoClient.db();
     db.collection('starboard').findOne({}, async function (err, res) {
         if (err) throw err;
@@ -37,7 +37,7 @@ client.on('ready', async () => {
         console.log(`Test user detected, setting presence to OFFLINE.`)
         client.user.setPresence({ status: 'invisible' })
     } else {
-        guild = client.guilds.cache.find(guild => guild.id == config.guildId)
+        guild = await client.guilds.fetch(config.guildId)
         client.user.setActivity(`over ${guild.name}`, {type: "WATCHING"})
     }
     client.commands = new Discord.Collection();
@@ -166,7 +166,19 @@ client.on('channelCreate', async (channel) => {
                 .setTitle('**A staff member will be here to help you soon.**')
                 .setDescription(`**Looking to join the guild?**\n[Guild forums post](${config.url.forums_post})\n*To apply, run the **/apply** command in a ticket.*\n**Applied and waiting for a response?**\nAsk a staff member to check your application. If it gets accepted, an invite will be sent to you when a staff member is online.\n**You aren\'t online?**\nAn offline invite will be sent. This means the next time you next log in, you will have 5 minutes to join the guild before the invite expires.`)
                 .setTimestamp()
-            channel.send({embeds: [embed]})
+            let linkingEmbed = new Discord.MessageEmbed()
+                .setColor(config.embedcolour.a)
+                .setTitle('**Before applying, please link your account!**')
+                .setDescription('If you are here to apply for guild membership:\nBefore you may apply, you must link your minecraft account to your discord account. Press the button to learn more.')
+                .setTimestamp()
+            let linkHelpButton = new Discord.MessageButton()
+                .setStyle(1)
+                .setEmoji('ℹ️')
+                .setLabel('Learn more.')
+                .setCustomId('link_help_button')
+            let row = new Discord.MessageActionRow()
+                .addComponents(linkHelpButton)
+            channel.send({embeds: [embed, linkingEmbed], components:[row]})
         }, 1000);
     }
 })
