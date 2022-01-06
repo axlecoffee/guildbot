@@ -1,7 +1,8 @@
 {
   "name": "guildbot",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Discord bot targeted at hypixel guilds. Offers automatic applications with in-game requirements, displaying guild and player info, and more.",
+  "author": "MCUniversity",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

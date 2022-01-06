@@ -172,10 +172,11 @@ module.exports = {
                     .setTimestamp()
                     .setColor(config.embedcolour.a)
                     .setTitle("Weekly guild exp leaderboard")
-                    .setFooter("Data updated every 60 seconds.")
-                for (let i = 0; i < 5; i++) {
+                ti = 5
+                if (arrData.length < 5) ti = arrData.length
+                for (let i = 0; i < ti; i++) {
                     let userData = arrData[i];
-                    embed.addField(`**${userData[1].rankName}** ${userData[0]}`, `Total: *${userData[1].total.toLocaleString("en")} exp*\nAverage daily: *${((Math.floor(userData[1].avg*100))/100).toLocaleString("en")} exp*`)
+                    embed.addField(`*#${i+1}* **${userData[1].rankName}** ${userData[0]}`, `Total: *${userData[1].total.toLocaleString("en")} exp*\nAverage daily: *${((Math.floor(userData[1].avg*100))/100).toLocaleString("en")} exp*`)
                 }
                 interaction.reply({
                     embeds: [embed],
@@ -258,8 +259,10 @@ module.exports = {
                             mostPlayedStr += ", "
                         }
                     }
+                    let gtag = ""
+                    if (data.guild.tag) gtag = `**[${data.guild.tag}]** `
                     let embed = new Discord.MessageEmbed()
-                        .setTitle(`**[${data.guild.tag}]** ${data.guild.name}`)
+                        .setTitle(`${gtag}${data.guild.name}`)
                         .setFooter(`uuid: ${data.guild._id}`)
                         .setTimestamp()
                         .setColor(config.embedcolour.a)
@@ -271,8 +274,6 @@ module.exports = {
                         .addField(`Publicly listed / Joinable:`, `${publiclyListed} / ${joinable}`)
                         .addField(`Preferred games:`, `${games}`)
                         .addField(`Top 10 most played games:`, `${mostPlayedStr}`)
-
-
                     interaction.reply({
                         embeds: [embed]
                     })

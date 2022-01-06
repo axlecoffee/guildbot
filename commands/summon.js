@@ -102,7 +102,7 @@ module.exports = {
                     let embed = new Discord.MessageEmbed()
                         .setTitle(`Kickwave calculation`)
                         .setColor(config.embedcolour.b)
-                        .setFooter(`Leaderboard data last updated ${minutes}min ${seconds}sec ago.`)
+                        .setFooter(`Data last updated ${minutes}min ${seconds}sec ago.`)
                     content = "```json\n[\n"
                     let leaderBoardData = res.data
                     let arrData = Object.entries(leaderBoardData)
@@ -110,7 +110,8 @@ module.exports = {
                         return a[1].total - b[1].total;
                     });
                     let count = interaction.options.getInteger('count')
-                    if (count > 25) {count = 25};
+                    if (count > 25) count = 25;
+                    if (count > arrData.length) count = arrData.length;
                     for (let i = 0;i<count;i++) {
                         let userData = arrData[i];
                         embed.addField(`**${userData[1].rankName}** - *${userData[0]}*`, `Total: *${userData[1].total.toLocaleString("en")} exp*\nAverage daily: *${((Math.floor(userData[1].avg*100))/100).toLocaleString("en")} exp*`, true)
