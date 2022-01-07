@@ -1,10 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
-
-const getTimestampFromID = async (discordId) => {
-    return (discordId / 4194304 + 1420070400000)
-}
+const functions = require('../functions.js')
 
 module.exports = {
     help: true,
@@ -19,7 +16,7 @@ module.exports = {
         await interaction.reply({embeds: [aembed], allowedMentions: {repliedUser: false}, fetchReply: true})
             .then(async (message) => {
                 let messageTimestamp = message.createdTimestamp
-                let interactionTimestamp = await getTimestampFromID(interaction.id)
+                let interactionTimestamp = await functions.getTimestampFromID(interaction.id)
                 let embed = new Discord.MessageEmbed()
                     .setColor(config.embedcolour.b)
                     .setTimestamp()

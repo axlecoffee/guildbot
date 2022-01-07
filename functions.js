@@ -11,6 +11,9 @@ const { colours } = require('./consoleFormatting.js')
 const { compare } = require('compare-versions')
 
 module.exports = {
+    async getTimestampFromID(discordId) {
+        return (discordId / 4194304 + 1420070400000)
+    },
     async checkForUpdates(client) {
         let baseUrl = config.repo.repoRaw
         https.get(baseUrl + "package.json", (res) => {

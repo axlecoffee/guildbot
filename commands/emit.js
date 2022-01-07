@@ -64,8 +64,8 @@ module.exports = {
                         .setAuthor(member.user.tag)
                         .setThumbnail(member.user.displayAvatarURL())
                         .addField('**Forced application**', `**Administrator:** ${interaction.user.tag}\n**User:** ${member.user.tag}\n**User's IGN:** ${inGameName}`)
-                    channel = client.channels.cache.get(config.channels.appLogChannelId)
-                    channel.send({
+                    channel = await client.channels.fetch(config.channels.appLogChannelId)
+                    await channel.send({
                         embeds: [logembed]
                     })
 
@@ -80,8 +80,8 @@ module.exports = {
                         .setCustomId('delete_message')
                     let row = new Discord.MessageActionRow()
                         .addComponents(deletebutton)
-                    queuechannel = client.channels.cache.get(config.channels.queueChannelId)
-                    queuechannel.send({
+                    queuechannel = await client.channels.fetch(config.channels.queueChannelId)
+                    await queuechannel.send({
                         embeds: [queueembed],
                         components: [row]
                     })
@@ -92,16 +92,15 @@ module.exports = {
                         .setTimestamp()
                         .addField('Your application was forcefully accepted.', 'Your application was accepted by an administrator. All requirement checks were bypassed.')
                         .addField("<:log_emoji:868054485933625346> Warning:", "Make sure to leave your current guild if you are in one, or we will not be able to send you an invitation.\nMake sure your guild invites are turned **on** in your privacy settings. You can view the settings inside the profile menu (Right click your head in slot 2 of your hotbar) from any lobby on the hypixel network.")
-                    interaction.channel.send({
+                    await interaction.channel.send({
                         embeds: [sucessembed],
                         components: []
                     });
-                    interaction.channel.send(`<@&${config.roles.helpers[0]}> <@&${config.roles.helpers[1]}>`)
+                    await interaction.channel.send(`<@&${config.roles.helpers[0]}> <@&${config.roles.helpers[1]}>`)
                     await interaction.reply({
                         content: "Success.",
                         ephemeral: true
-                    })
-                    await MongoClient.close()
+                    }).then(() => {MongoClient.close()})
                 }
             })
         } else if (interaction.options.getSubcommand() == 'message') {
@@ -112,7 +111,5 @@ module.exports = {
                 ephemeral: true
             })
         }
-
-
     },
 };

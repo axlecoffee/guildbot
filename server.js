@@ -53,21 +53,19 @@ client.on('ready', async () => {
 client.on('interactionCreate', async (interaction) => {
 	if (interaction.isButton()) {
         functions.statistics.increaseButtonCount()
-        button = interaction;
         try {
-            let buttonFile = require(`./buttons/${button.customId}.js`);
-            buttonFile.run(client, button)
+            let interactionFile = require(`./buttons/${interaction.customId}.js`);
+            interactionFile.execute(client, interaction)
         } catch (err) {
-            return console.log(err);
+            return console.error(err);
         }
     } else if (interaction.isSelectMenu()) {
         functions.statistics.increaseSelectMenuCount()
-        menu = interaction;
         try {
-            let menuFile = require(`./menu/${menu.customId}.js`);
-            menuFile.run(client, menu)
+            let interactionFile = require(`./menu/${interaction.customId}.js`);
+            interactionFile.execute(client, interaction)
         } catch (err) {
-            return console.log(err);
+            return console.error(err);
         }
     } else if (interaction.isCommand()) {
         functions.statistics.increaseCommandCount()

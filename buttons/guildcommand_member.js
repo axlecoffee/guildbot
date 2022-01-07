@@ -2,8 +2,9 @@ const Discord = require('discord.js')
 const https = require('https')
 const config = require('../config.json')
 
-module.exports.run = async (client, button) => {
-    let message = button.message
+module.exports = {
+    async execute(client, interaction) {
+    let message = interaction.message
     let passedData = JSON.parse((message.content).replace("||", "").replace("||", ""))
     https.get(`https://api.hypixel.net/guild?key=${process.env.APIKEY}&id=${config.hypixelGuildId}`, (res) => {
         let data = "";
@@ -57,21 +58,21 @@ module.exports.run = async (client, button) => {
                                         .setCustomId('guildcommand_user')
                                     let row = new Discord.MessageActionRow()
                                         .addComponents(memberButton, userButton)
-                                    button.update({
+                                    interaction.update({
                                         content: message.content,
                                         embeds: [embed],
                                         components: [row]
                                     })
                                 })
-                            }).on('error', (err) => {console.error(err); return button.reply({content: `**There was an error while executing this action!**\n*{${err}}*`, ephemeral: true})})
+                            }).on('error', (err) => {console.error(err); return interaction.reply({content: `**There was an error while executing this action!**\n*{${err}}*`, ephemeral: true})})
 
 
                         })
 
-                    }).on('error', (err) => {console.error(err); return button.reply({content: `**There was an error while executing this action!**\n*{${err}}*`, ephemeral: true})})
+                    }).on('error', (err) => {console.error(err); return interaction.reply({content: `**There was an error while executing this action!**\n*{${err}}*`, ephemeral: true})})
                 })
-            }
-
-        })
-    }).on('error', (err) => {console.error(err); return button.reply({content: `**There was an error while executing this action!**\n*{${err}}*`, ephemeral: true})})
+                }            
+            })
+        }).on('error', (err) => {console.error(err); return interaction.reply({content: `**There was an error while executing this action!**\n*{${err}}*`, ephemeral: true})})
+    }
 }
