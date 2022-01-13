@@ -22,7 +22,6 @@ client.on('error', async (err) => {
 
 //client.on('debug', async (debug) => {console.info(debug)}) //Uncomment for debugging.
 
-//Send login message and setup bot activity; Register slash commands
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     await MongoClient.connect();
@@ -30,7 +29,7 @@ client.on('ready', async () => {
     db.collection('starboard').findOne({}, async function (err, res) {
         if (err) throw err;
         if (res != undefined) {
-            db.collection('starboard').drop().then(() => MongoClient.close()) //Drop starboard collection if it exists, as all the data is unusable after the bot restarts.
+            db.collection('starboard').drop().then(() => MongoClient.close())
         }
     })
     if (client.user.id == "886676473019269160") {
@@ -49,7 +48,6 @@ client.on('ready', async () => {
     functions.leaderboardDataUpdate(client)
 })
 
-//Handle commands, buttons and select menus
 client.on('interactionCreate', async (interaction) => {
 	if (interaction.isButton()) {
         functions.statistics.increaseButtonCount()
@@ -140,13 +138,13 @@ client.on('interactionCreate', async (interaction) => {
     }
 });
 
-//Update the member counter channel when someone joins the server
 client.on('guildMemberAdd', async (member) => {
     if (member.guild.id == config.guildId) {
         let num = member.guild.memberCount;
         member.guild.channels.cache.get(config.channels.memberCount.discord).setName(`📊Members: ${num}📊`);
     }
 });
+
 client.on('guildMemberRemove', async (member) => {
     if (member.guild.id == config.guildId) {
         let num = member.guild.memberCount;
@@ -154,7 +152,31 @@ client.on('guildMemberRemove', async (member) => {
     }
 });
 
-//Send info message one second after someone creates a ticket
+client.on('messageCreate', async (message) => {
+    if (message.guild.id != config.guildId) return;
+    if (message.channel.type == 'GUILD_TEXT' && message.channel.name.startsWith('ticket-') && !message.author.bot) {
+        await MongoClient.connect()
+        let db = MongoClient.db()
+        db.collection('tickets').findOne({ sid: 'ticket_introduction_message', discord_id: message.author.id }, async function(err, res){
+            if (err) throw err;
+            if (res == undefined) {
+                await db.collection('tickets').insertOne({ sid: 'ticket_introduction_message', discord_id: message.author.id })
+                const embed = new Discord.MessageEmbed()
+                    .setTitle(`**Hello ${message.author.tag}, welcome to ${message.guild.name}!**`)
+                    .setDescription(`I see it is your first time opening a ticket here. If you are here to apply for guild membership, **please do not bother the staff unless you have a problem**.\nThis process is completely automated and handled by me.\nIf you wish to apply you must do the following:\n\`\`\`• Log on to the hypixel network and set your discord account in the social menu (/link tutorial for more information on how to do that.)\n• Use the /link update command so I can confirm you are the owner of that minecraft account. (Make sure you use my /link command not the commands of other bots)\n• Use the /apply command to submit your application. \n\`\`\`If your application is accepted, you will be placed in an invite queue, and **a member of the staff team will invite you when they are online**.`)
+                    .setFooter(`You are seeing this message because it is your first time opening a ticket. This message will not be repeated.`)
+                    .setTimestamp()
+                await message.reply({
+                    embeds: [embed],
+                    ephemeral: true
+                }).then(async () => {
+                    await MongoClient.close()
+                })
+            }
+        })
+    }
+})
+
 client.on('channelCreate', async (channel) => {
     if (channel.type == 'GUILD_TEXT' && channel.name.startsWith('ticket-')) {
         setTimeout(() => {
@@ -162,7 +184,11 @@ client.on('channelCreate', async (channel) => {
             let embed = new Discord.MessageEmbed()
                 .setColor(config.embedcolour.a)
                 .setTitle('**A staff member will be here to help you soon.**')
-                .setDescription(`**Looking to join the guild?**\n[Guild forums post](${config.url.forums_post})\n*To apply, run the **/apply** command in a ticket.*\n**Applied and waiting for a response?**\nAsk a staff member to check your application. If it gets accepted, an invite will be sent to you when a staff member is online.\n**You aren\'t online?**\nAn offline invite will be sent. This means the next time you next log in, you will have 5 minutes to join the guild before the invite expires.`)
+                .setTimestamp()
+            let nomembershipembed = new Discord.MessageEmbed()
+                .setColor(config.embedcolour.a)
+                .setTitle('**A staff member will be here to help you soon.**')
+                .setDescription(`**Looking to join the guild?**\n[Guild forums post](${config.url.forums_post})\n*To apply, run the **/apply** command in a ticket.*\n**Applied and accepted?**\nAn invite will be sent to you when a staff member is online.\n**You aren\'t online?**\nAn offline invite will be sent. This means the next time you next log in, you will have 5 minutes to join the guild before the invite expires.`)
                 .setTimestamp()
             let linkingEmbed = new Discord.MessageEmbed()
                 .setColor(config.embedcolour.a)
@@ -176,7 +202,19 @@ client.on('channelCreate', async (channel) => {
                 .setCustomId('link_help_button')
             let row = new Discord.MessageActionRow()
                 .addComponents(linkHelpButton)
-            channel.send({embeds: [embed, linkingEmbed], components:[row]})
+            channel.messages.fetch().then(async messages => {
+                let id = await messages.find(m => /\<\@[0123456789]*\>/.test(m.content)).content.replace(/[^0123456789]/g, '')
+                let member = await channel.guild.members.fetch(id)
+                if (member) {
+                    if (member.roles.cache.has(config.roles.guildMemberRole)) {
+                        channel.send({embeds: [embed]})
+                    } else {
+                        channel.send({embeds: [nomembershipembed, linkingEmbed], components:[row]})
+                    }        
+                } else {
+                    channel.send({embeds: [nomembershipembed, linkingEmbed], components:[row]})
+                }
+            }).catch(console.error);
         }, 1000);
     }
 })
