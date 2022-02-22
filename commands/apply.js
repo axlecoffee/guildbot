@@ -2,8 +2,17 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
 
+let permissions = undefined
+let setDef = true
+
+if (config.permissions.apply != undefined) {
+    permissions = config.permissions.apply
+    setDef = false
+}
+
 module.exports = {
     help: true,
+    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('apply')
         .setDescription(`List of available guild applications.`),
@@ -21,7 +30,7 @@ module.exports = {
         let row = new Discord.MessageActionRow()
             .addComponents(guildmemberbutton, guildstaffbutton)
         let embed = new Discord.MessageEmbed()
-            .setColor(config.embedcolour.a)
+            .setColor(config.colours.main)
             .setTimestamp()
             .addField('**Guild applications**', 'Select an application.')
         interaction.reply({

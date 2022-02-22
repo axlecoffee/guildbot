@@ -7,16 +7,21 @@ require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const functions = require('../functions.js')
+
+let permissions = undefined
+let setDef = true
+
+if (config.permissions.emit != undefined) {
+    permissions = config.permissions.emit
+    setDef = false
+}
+
 module.exports = {
     help: false,
-    permissions: [{
-        id: config.roles.adminRole,
-        type: 1,
-        permission: true
-    }],
+    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('emit')
-        .setDefaultPermission(false)
+        .setDefaultPermission(setDef)
         .setDescription(`Emit an event.`)
         .addSubcommand(command => command
             .setName('force-apply')
@@ -59,18 +64,18 @@ module.exports = {
                 } else {
                     let member = await interaction.guild.members.fetch(discordUser)
                     const logembed = new Discord.MessageEmbed()
-                        .setColor(config.embedcolour.c)
+                        .setColor(config.colours.secondary)
                         .setTimestamp()
                         .setAuthor(member.user.tag)
                         .setThumbnail(member.user.displayAvatarURL())
                         .addField('**Forced application**', `**Administrator:** ${interaction.user.tag}\n**User:** ${member.user.tag}\n**User's IGN:** ${inGameName}`)
-                    channel = await client.channels.fetch(config.channels.appLogChannelId)
+                    channel = await client.channels.fetch(config.channels.appChannelId)
                     await channel.send({
                         embeds: [logembed]
                     })
 
                     const queueembed = new Discord.MessageEmbed()
-                        .setColor(config.embedcolour.c)
+                        .setColor(config.colours.secondary)
                         .setTimestamp()
                         .addField(`**${inGameName}**`, `\`\`/g invite ${inGameName}\`\``)
                     let deletebutton = new Discord.MessageButton()
@@ -88,15 +93,21 @@ module.exports = {
                     member.roles.add(config.roles.guildMemberRole)
                     functions.statistics.increaseGuildApplicationCount()
                     let sucessembed = new Discord.MessageEmbed()
-                        .setColor(config.embedcolour.a)
+                        .setColor(config.colours.main)
                         .setTimestamp()
                         .addField('Your application was forcefully accepted.', 'Your application was accepted by an administrator. All requirement checks were bypassed.')
-                        .addField("<:log_emoji:868054485933625346> Warning:", "Make sure to leave your current guild if you are in one, or we will not be able to send you an invitation.\nMake sure your guild invites are turned **on** in your privacy settings. You can view the settings inside the profile menu (Right click your head in slot 2 of your hotbar) from any lobby on the hypixel network.")
+                        .addField(`${config.emoji.log} Warning:`, "Make sure to leave your current guild if you are in one, or we will not be able to send you an invitation.\nMake sure your guild invites are turned **on** in your privacy settings. You can view the settings inside the profile menu (Right click your head in slot 2 of your hotbar) from any lobby on the hypixel network.")
                     await interaction.channel.send({
                         embeds: [sucessembed],
                         components: []
                     });
-                    await interaction.channel.send(`<@&${config.roles.helpers[0]}> <@&${config.roles.helpers[1]}>`)
+                    let helperPing=""
+                    for (let i = 0;i<config.roles.helperRole.length;i++) {
+                        helperPing+=`<@&${config.roles.helperRole[i]}>`
+                    }
+                    if (helperPing!="") {
+                        await interaction.channel.send(helperPing)
+                    }
                     await interaction.reply({
                         content: "Success.",
                         ephemeral: true

@@ -20,7 +20,8 @@
     "node": "16.x"
   },
   "repository": {
-    "url": "https://github.com/MCUniversity/guildbot"
+    "url": "https://github.com/MCUniversity/guildbot",
+    "urlRaw": "https://raw.githubusercontent.com/MCUniversity/guildbot/main/"
   },
   "license": "GPL-3.0"
 }

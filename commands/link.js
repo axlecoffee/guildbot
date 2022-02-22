@@ -6,11 +6,21 @@ require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
+let permissions = undefined
+let setDef = true
+
+if (config.permissions.link != undefined) {
+    permissions = config.permissions.link
+    setDef = false
+}
+
 module.exports = {
     help: true,
+    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('link')
         .setDescription(`Minecraft account linking system.`)
+        .setDefaultPermission(setDef)
         .addSubcommand(subCommand => subCommand
             .setName('check')
             .setDescription('Check the status of someone\'s account link or your own.')
@@ -49,7 +59,7 @@ module.exports = {
                     userData = res.minecraft_name;
                 }
                 let embed = new Discord.MessageEmbed()
-                    .setColor(config.embedcolour.a)
+                    .setColor(config.colours.main)
                     .setTimestamp()
                     .setTitle(`${user.username}#${user.discriminator}`)
                 if (userData == undefined) {
@@ -113,16 +123,16 @@ module.exports = {
                                                 }
                                             })
                                             let logembed = new Discord.MessageEmbed()
-                                                .setColor(config.embedcolour.b)
+                                                .setColor(config.colours.main)
                                                 .setTimestamp()
-                                                .setTitle('<:log_emoji:868054485933625346> LOG')
+                                                .setTitle(`${config.emoji.log} LOG`)
                                                 .addField(`**Account link successful.**`, `**Discord account tag:** ${interaction.user.tag}\n**Discord account ID:** ${interaction.user.id}\n**Minecraft account name:** ${uuid_data.name}\n**Minecraft account UUID:** ${uuid_data.id}\n`)
                                             let logchannel = client.channels.cache.get(config.channels.logChannelId)
                                             logchannel.send({
                                                 embeds: [logembed]
                                             })
                                             let embed = new Discord.MessageEmbed()
-                                                .setColor(config.embedcolour.a)
+                                                .setColor(config.colours.main)
                                                 .setTimestamp()
                                                 .addField("Success.", `Successfully linked **${uuid_data.name}** to **<@${interaction.user.id}>**`)
                                             interaction.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
@@ -130,7 +140,7 @@ module.exports = {
                                             let embed = new Discord.MessageEmbed()
                                                 .setColor('RED')
                                                 .setTimestamp()
-                                                .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
+                                                .setTitle(`${config.emoji.error} An error has occurred.`)
                                                 .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
                                             interaction.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                             setTimeout(() => {interaction.deleteReply()}, 15000);
@@ -140,7 +150,7 @@ module.exports = {
                                         let embed = new Discord.MessageEmbed()
                                                 .setColor('RED')
                                                 .setTimestamp()
-                                                .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
+                                                .setTitle(`${config.emoji.error} An error has occurred.`)
                                                 .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
                                         interaction.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                         setTimeout(() => {interaction.deleteReply()}, 15000);
@@ -149,14 +159,14 @@ module.exports = {
                                     let embed = new Discord.MessageEmbed()
                                         .setColor('RED')
                                         .setTimestamp()
-                                        .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
+                                        .setTitle(`${config.emoji.error} An error has occurred.`)
                                         .addField(`**${data.cause}**`, `*This probably means the API key is invalid. Ping <@299265668522442752>.*`)
                                     interaction.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                     setTimeout(() => {interaction.deleteReply()}, 15000);
                                     let logembed = new Discord.MessageEmbed()
                                         .setColor('RED')
                                         .setTimestamp()
-                                        .setTitle('<:error_emoji:868054485946224680> ERROR')
+                                        .setTitle(`${config.emoji.error} ERROR`)
                                         .addField(`**Cause: **`, `A player ran a bot command and the Hypixel API key provided by the config file was invalid.`)
                                     let logchannel = client.channels.cache.get(config.channels.logChannelId)
                                     logchannel.send({
@@ -173,7 +183,7 @@ module.exports = {
                         let embed = new Discord.MessageEmbed()
                             .setColor('RED')
                             .setTimestamp()
-                            .setTitle('<:error_emoji:868054485946224680> An error has occurred.')
+                            .setTitle(`${config.emoji.error} An error has occurred.`)
                             .addField(`**A Mojang API error occurred**`, `*This probably means the username you entered does not exist.*`)
                             try{embed.addField(`**Additional info available: ${uuid_data.error}**`, `**${uuid_data.errorMessage}**`)}catch(err){}
                         interaction.reply({embeds: [embed], allowedMentions: { repliedUser: false }})

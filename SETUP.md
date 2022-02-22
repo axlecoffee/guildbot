@@ -25,21 +25,32 @@ The **config.json** file is used for saving less sesitive configuration data.
 ```json
 
 {
-    "guildId": "DISCORDID",
+    "discordGuildId": "DISCORDID",
     "hypixelGuildId":"UUID",
-    "embedcolour": {
-        "a":"1EC45B",
-        "b":"00AA00",
-        "c":"0075FC"
+    "colours": {
+        "main":"00FFF0",
+        "secondary":"202225",
+        "success":"00FF50",
+        "warning":"FFFF10",
+        "error":"FF1F00"
     },
     "roles":{
         "guildMemberRole":"DISCORDID",
-        "helpers":["DISCORDID", "DISCORDID"],
-        "adminRole":"DISCORDID"
+        "helpers":["DISCORDID", "DISCORDID", ...],
+        "adminRole":["DISCORDID", "DISCORDID", ...]
+    },
+    "permissions": {
+        "emit":[{"id":"DISCORDID","type":1,"permission":true}],
+        "emojify":[{"id":"DISCORDID","type":1,"permission":true}],
+        "summon":[{"id":"DISCORDID","type":1,"permission":true}],
+        ...
+    },
+    "scheduledEvents": {
+        "leaderboardDataUpdate":"*/1 * * * *"
     },
     "channels":{
         "logChannelId":"DISCORDID",
-        "appLogChannelId":"DISCORDID",
+        "appChannelId":"DISCORDID",
         "queueChannelId":"DISCORDID",
         "ticketCategoryId":"DISCORDID",
         "starboardChannelId":"DISCORDID",
@@ -48,6 +59,19 @@ The **config.json** file is used for saving less sesitive configuration data.
             "guild":"DISCORDID"
         }
     },
+    "emoji": {
+        "warning": "<:warning_emoji:868054485992357948>",
+        "error":"<:error_emoji:868054485946224680>",
+        "star":"<:GoldStar:905915895937892403>",
+        "log":"<:log_emoji:868054485933625346>",
+        "helpEmoji":"<:KannaSip:889543061821063189>",
+        "helpCommands":"<:slash:913172347639435285>",
+        "helpButtons":"<:button:913172562001928193>",
+        "helpMenus":"<:dropdown_select:914106174754947113>",
+        "github":"<:github:888155742719328276>",
+        "plus":"<:plus:888072519582634075>",
+        "minus":"<:minus:888072653003452516>"
+    },
     "url":{
         "guild_staff_application":"URL",
         "forums_post":"URL"
@@ -55,33 +79,29 @@ The **config.json** file is used for saving less sesitive configuration data.
     "starboard":{
         "minimumCount": 4
     },
-    "emoji":{
+    "emojify":{
         "halloween":{"e": ["🍬", "🎃", "👻", "🦇"], "desc":"Halloween emoji"},
         "christmas":{"e": ["🎄", "⛄", "🎁", "🍪"], "desc":"Christmas emoji"}
-    },
-    "repo": {
-        "maintainer":"@MCUniversity#0859",
-        "supportServerInviteCode":"whGyz8ABM5",
-        "repoUrl":"https://github.com/MCUniversity/guildbot",
-        "repoRaw":"https://raw.githubusercontent.com/MCUniversity/guildbot/main/"
     }
 }
 
 ```
 
-**guildId** is the ID of the discord server the bot operates in.
+**discordGuildId** is the ID of the discord server the bot operates in.
 
 **hypixelGuildId** is the UUID of the hypixel guild.
 
-**embedcolour** is an object containing HEX values for various colours the bot uses. You can change these if you do not like the default ones.
+**colours** is an object containing HEX values for various colours the bot uses. You can change these if you do not like the default ones.
 
 **roles** is an object containing ID's of various discord roles.
 
 - **guildMemberRole** is the role a guild member recieves when their application is accepted.
 
-- **helpers** are the 2 roles that get pinged when an application is accepted so they can invite the member.
+- **helpers** are the roles that get pinged when an application is accepted so they can invite the member.
 
-- **adminRole** is the role that will grant users permission to access administrator-only commands such as /emit and /summon in the bot.
+- **adminRole** is the administrator role.
+
+**permissions** is an object containing arrays of command permissions. Every item in the object has the name of a command. Every item's array contains objects with the following format: {id: "DISCORD_ROLE_OR_USER_ID", type: 1_OR_2, permission: true_OR_false}. For more info on how to setup the command permission check these [discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 
 **scheduledEvents** contains strings for various repeating scheduled tasks that are used by [node-schedule](https://www.npmjs.com/package/node-schedule). They are formatted like this:
 
@@ -106,7 +126,7 @@ For more complex configuration check the module's [repository on npmjs.com](http
 
 - **logChannelId** - channel used for general logs.
 
-- **appLogChannelId** - channel used for membership application logs. Can be the same or seperate as the default log channel.
+- **appChannelId** - channel used for membership application logs. Can be the same or seperate as the default log channel.
 
 - **queueChannelId** - channel used for the invite queue feature - when a member is to be invited, a message gets sent in this channel with their name and an easy to copy command for staff members to use. After they are invited, the message for that member can be easily deleted via a button.
 
@@ -122,11 +142,13 @@ For more complex configuration check the module's [repository on npmjs.com](http
 
 - **forums_post** is the guild's forums post. This is linked when a ticket is created.
 
+**emoji** contains a list of various custom discord emoji you can change to your prefrence, if your bot does not have access to view the default ones.
+
 **starboard** contains configuration options for the starboard feature
 
 - **minimumCount** defines the minimum amount of stars a message needs before being sent to the starboard.
 
-**emoji** contains emoji for the /emojify command. The command allows administrators to add random emoji prefixes to all guild members. You may add your own options if you wish, using this formula (There is no coded limit to the amount of various emoji, but don't go over the top. Too many may lag the bot. Putting one will result in that single emoji being applied everywhere):
+**emojify** contains emoji for the /emojify command. The command allows administrators to add random emoji prefixes to all guild members. You may add your own options if you wish, using this formula (There is no coded limit to the amount of various emoji, but don't go over the top. Too many may lag the bot. Putting one will result in that single emoji being applied everywhere):
 
 ```json
 "name_of_option": {"e":["emoji1", "emoji2"], "desc":"A short description of this option"}

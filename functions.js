@@ -15,7 +15,7 @@ module.exports = {
         return (discordId / 4194304 + 1420070400000)
     },
     async checkForUpdates(client) {
-        let baseUrl = config.repo.repoRaw
+        let baseUrl = pkg.repository.urlRaw
         https.get(baseUrl + "package.json", (res) => {
             let data = "";
             res.on('data', data_chunk => {
@@ -28,20 +28,20 @@ module.exports = {
                     let embed = new Discord.MessageEmbed()
                         .setColor('YELLOW')
                         .setTimestamp()
-                        .addField('<:warning_emoji:868054485992357948> Warning!', `You are running either an unreleased or a misconfigured version of GuildBot. \nOnly proceed if you are sure you know what you're doing. \nIf not, contact ${config.repo.maintainer} about this or post an issue on the github repository: ${config.repo.repoUrl}.`)
+                        .addField(`${config.emoji.warning} Warning!`, `You are running either an unreleased or a misconfigured version of GuildBot. \nOnly proceed if you are sure you know what you're doing. \nIf not, contact ${pkg.author} about this or post an issue on the github repository: ${pkg.repository.url}.`)
                     channel.send({
                         embeds: [embed]
                     })
-                    console.warn(`${colours.reset}${colours.fg.yellow}You are running either an unreleased or a misconfigured version of GuildBot. Only proceed if you are sure you know what you're doing. If not, contact ${config.repo.maintainer} about this or post an issue on the github repository: ${config.repo.repoUrl}.${colours.reset}`)
+                    console.warn(`${colours.reset}${colours.fg.yellow}You are running either an unreleased or a misconfigured version of GuildBot. Only proceed if you are sure you know what you're doing. If not, contact ${pkg.author} about this or post an issue on the github repository: ${pkg.repository.url}.${colours.reset}`)
                 } else if (compare(pkg.version.toString(), packageData.version.toString(), "<")) {
                     let embed = new Discord.MessageEmbed()
                         .setColor('YELLOW')
                         .setTimestamp()
-                        .addField('<:warning_emoji:868054485992357948> Warning!', `A new version of GuildBot is available!\n**${pkg.version} => ${packageData.version}**\nDownload it now at ${config.repo.repoUrl}`)
+                        .addField(`${config.emoji.warning} Warning!`, `A new version of GuildBot is available!\n**${pkg.version} => ${packageData.version}**\nDownload it now at ${pkg.repository.url}`)
                     channel.send({
                         embeds: [embed]
                     })
-                    console.info(`${colours.reset}${colours.fg.yellow}A new version of GuildBot is available!\n${colours.bright}${pkg.version} => ${packageData.version}\n${colours.reset}${colours.fg.yellow}Download it now at ${config.repo.repoUrl}${colours.reset}`)
+                    console.info(`${colours.reset}${colours.fg.yellow}A new version of GuildBot is available!\n${colours.bright}${pkg.version} => ${packageData.version}\n${colours.reset}${colours.fg.yellow}Download it now at ${pkg.repository.url}${colours.reset}`)
                 } else if (compare(pkg.version.toString(), packageData.version.toString(), "=")) {
                     console.log(`${colours.fg.white}No updates available. You are running the latest version of GuildBot: ${colours.bright}${pkg.version}${colours.reset}`)
                 }

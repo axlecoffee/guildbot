@@ -1,5 +1,6 @@
 const Discord = require('discord.js')
 const config = require('../config.json')
+const pkg = require('../package.json')
 
 module.exports = { 
     async execute(client, interaction) {
@@ -17,11 +18,11 @@ module.exports = {
         let row = new Discord.MessageActionRow()
             .addComponents(buttonBackwards, buttonFoward)
         const embed = new Discord.MessageEmbed()
-            .setColor(config.embedcolour.b)
+            .setColor(config.colours.secondary)
             .setTimestamp()
             .setTitle("Found a bug? Have a feature request? Need help?")
-            .setDescription(`<:DiscordLogoWhite:888158984475918368> [Support server](https://discord.gg/${config.repo.supportServerInviteCode})\n<:github:888155742719328276> [GitHub](https://github.com/MCUniversity/guildbot)`)
-            .setFooter('Developed by @MCUniversity#0859')
+            .setDescription(`${config.emoji.github} [GitHub](https://github.com/MCUniversity/guildbot)`)
+            .setFooter(`Developed by ${pkg.author}>`)
         interaction.update({
             embeds: [embed],
             components: [row]

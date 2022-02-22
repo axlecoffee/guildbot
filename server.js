@@ -15,7 +15,7 @@ const config = require('./config.json')
 client.on('error', async (err) => {
     const channel = await client.channels.cache.get(config.channels.logChannelId)
     const embed = new Discord.MessageEmbed()
-        .setTitle('<:error_emoji:868054485946224680> A DiscordAPIError has occurred.')
+        .setTitle(`${config.emoji.error} A DiscordAPIError has occurred.`)
         .addField('**Cause: **', `\`\`${err.message}\`\``)
     channel.send({embeds:[embed]})
 })
@@ -36,14 +36,14 @@ client.on('ready', async () => {
         console.log(`Test user detected, setting presence to OFFLINE.`)
         client.user.setPresence({ status: 'invisible' })
     } else {
-        guild = await client.guilds.fetch(config.guildId)
+        guild = await client.guilds.fetch(config.discordGuildId)
         client.user.setActivity(`over ${guild.name}`, {type: "WATCHING"})
     }
     client.commands = new Discord.Collection();
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {const command = require(`./commands/${file}`); client.commands.set(command.data.name, command);}
     const deployCommands = require(`./slashCommands.js`);
-    deployCommands.deploy(client, client.user.id, config.guildId)
+    deployCommands.deploy(client, client.user.id, config.discordGuildId)
     functions.checkForUpdates(client)
     functions.leaderboardDataUpdate(client)
 })
@@ -139,21 +139,21 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.on('guildMemberAdd', async (member) => {
-    if (member.guild.id == config.guildId) {
+    if (member.guild.id == config.discordGuildId) {
         let num = member.guild.memberCount;
         member.guild.channels.cache.get(config.channels.memberCount.discord).setName(`📊Members: ${num}📊`);
     }
 });
 
 client.on('guildMemberRemove', async (member) => {
-    if (member.guild.id == config.guildId) {
+    if (member.guild.id == config.discordGuildId) {
         let num = member.guild.memberCount;
         member.guild.channels.cache.get(config.channels.memberCount.discord).setName(`📊Members: ${num}📊`);
     }
 });
 
 client.on('messageCreate', async (message) => {
-    if (message.guild.id != config.guildId) return;
+    if (message.guild.id != config.discordGuildId) return;
     if (message.channel.type == 'GUILD_TEXT' && message.channel.name.startsWith('ticket-') && !message.author.bot) {
         await MongoClient.connect()
         let db = MongoClient.db()
@@ -182,16 +182,16 @@ client.on('channelCreate', async (channel) => {
         setTimeout(() => {
             channel.setParent(config.channels.ticketCategoryId, { lockPermissions: false })
             let embed = new Discord.MessageEmbed()
-                .setColor(config.embedcolour.a)
+                .setColor(config.colours.main)
                 .setTitle('**A staff member will be here to help you soon.**')
                 .setTimestamp()
             let nomembershipembed = new Discord.MessageEmbed()
-                .setColor(config.embedcolour.a)
+                .setColor(config.colours.main)
                 .setTitle('**A staff member will be here to help you soon.**')
                 .setDescription(`**Looking to join the guild?**\n[Guild forums post](${config.url.forums_post})\n*To apply, run the **/apply** command in a ticket.*\n**Applied and accepted?**\nAn invite will be sent to you when a staff member is online.\n**You aren\'t online?**\nAn offline invite will be sent. This means the next time you next log in, you will have 5 minutes to join the guild before the invite expires.`)
                 .setTimestamp()
             let linkingEmbed = new Discord.MessageEmbed()
-                .setColor(config.embedcolour.a)
+                .setColor(config.colours.main)
                 .setTitle('**Before applying, please link your account!**')
                 .setDescription('If you are here to apply for guild membership:\nBefore you may apply, you must link your minecraft account to your discord account. Press the button to learn more.')
                 .setTimestamp()
@@ -221,8 +221,8 @@ client.on('channelCreate', async (channel) => {
 
 client.on('messageReactionAdd', async (messageReaction, user) => {
     message = messageReaction.message;
-    if (messageReaction.emoji.name == "⭐" && message.guild.id == config.guildId && message.author.id != client.user.id && messageReaction.count >= config.starboard.minimumCount) {
-        message.react(`<:GoldStar:905915895937892403>`)
+    if (messageReaction.emoji.name == "⭐" && message.guild.id == config.discordGuildId && message.author.id != client.user.id && messageReaction.count >= config.starboard.minimumCount) {
+        message.react(`${config.emoji.star}`)
         let embed = new Discord.MessageEmbed()
             .setAuthor(message.author.tag.toString(), message.author.displayAvatarURL())
             .setFooter(`${messageReaction.count}⭐`)
@@ -265,7 +265,7 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
 
 client.on('messageReactionRemove', async (messageReaction, user) => {
     message = messageReaction.message;
-    if (messageReaction.emoji.name == "⭐" && message.guild.id == config.guildId && message.author.id != client.user.id && messageReaction.count >= config.starboard.minimumCount) {
+    if (messageReaction.emoji.name == "⭐" && message.guild.id == config.discordGuildId && message.author.id != client.user.id && messageReaction.count >= config.starboard.minimumCount) {
         let embed = new Discord.MessageEmbed()
             .setAuthor(message.author.tag.toString(), message.author.displayAvatarURL())
             .setFooter(`${messageReaction.count}⭐`)

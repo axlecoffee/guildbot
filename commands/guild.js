@@ -8,12 +8,22 @@ require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
+let permissions = undefined
+let setDef = true
+
+if (config.permissions.guild != undefined) {
+    permissions = config.permissions.guild
+    setDef = false
+}
+
 module.exports = {
     help: true,
     cooldown: 2000,
+    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('guild')
         .setDescription(`Access data about the guild and its members.`)
+        .setDefaultPermission(setDef)
         .addSubcommand(subcommand => subcommand
             .setName('checkuser')
             .setDescription("Fetch data about a user.")
@@ -104,7 +114,7 @@ module.exports = {
                                                         rank = "MVP"
                                                     }
                                                     let embed = new Discord.MessageEmbed()
-                                                        .setColor(config.embedcolour.a)
+                                                        .setColor(config.colours.main)
                                                         .setTimestamp()
                                                         .setTitle(`**${rank}** ${inGameName} - Guild member data`)
                                                         .setFooter(`uuid: ${member.uuid}`)
@@ -170,7 +180,7 @@ module.exports = {
                 });
                 let embed = new Discord.MessageEmbed()
                     .setTimestamp()
-                    .setColor(config.embedcolour.a)
+                    .setColor(config.colours.main)
                     .setTitle("Weekly guild exp leaderboard")
                 ti = 5
                 if (arrData.length < 5) ti = arrData.length
@@ -265,7 +275,7 @@ module.exports = {
                         .setTitle(`${gtag}${data.guild.name}`)
                         .setFooter(`uuid: ${data.guild._id}`)
                         .setTimestamp()
-                        .setColor(config.embedcolour.a)
+                        .setColor(config.colours.main)
                         .addField(`Created on:`, `${new Date(data.guild.created)}`)
                         .addField(`Guild level:`, `${level}`)
                         .addField(`Guild members:`, `${data.guild.members.length}`)

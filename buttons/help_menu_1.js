@@ -17,7 +17,7 @@ module.exports = {
         let row = new Discord.MessageActionRow()
             .addComponents(buttonBackwards, buttonFoward)
         const embed = new Discord.MessageEmbed()
-            .setColor(config.embedcolour.b)
+            .setColor(config.colours.secondary)
             .setTimestamp()
             .setFooter('Developed by @MCUniversity#0859')
             .setTitle("Commands:")

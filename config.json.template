@@ -1,22 +1,30 @@
 {
-    "guildId": "DISCORDID",
+    "discordGuildId": "DISCORDID",
     "hypixelGuildId":"UUID",
-    "embedcolour": {
-        "a":"1EC45B",
-        "b":"00AA00",
-        "c":"0075FC"
+    "colours": {
+        "main":"00FFF0",
+        "secondary":"202225",
+        "success":"00FF50",
+        "warning":"FFFF10",
+        "error":"FF1F00"
     },
     "roles":{
         "guildMemberRole":"DISCORDID",
-        "helpers":["DISCORDID", "DISCORDID"],
-        "adminRole":"DISCORDID"
+        "helpers":["DISCORDID", "DISCORDID", ...],
+        "adminRole":["DISCORDID", "DISCORDID", ...]
+    },
+    "permissions": {
+        "emit":[{"id":"DISCORDID","type":1,"permission":true}],
+        "emojify":[{"id":"DISCORDID","type":1,"permission":true}],
+        "summon":[{"id":"DISCORDID","type":1,"permission":true}],
+        ...
     },
     "scheduledEvents": {
         "leaderboardDataUpdate":"*/1 * * * *"
     },
     "channels":{
         "logChannelId":"DISCORDID",
-        "appLogChannelId":"DISCORDID",
+        "appChannelId":"DISCORDID",
         "queueChannelId":"DISCORDID",
         "ticketCategoryId":"DISCORDID",
         "starboardChannelId":"DISCORDID",
@@ -25,6 +33,19 @@
             "guild":"DISCORDID"
         }
     },
+    "emoji": {
+        "warning":"<:warning_emoji:868054485992357948>",
+        "error":"<:error_emoji:868054485946224680>",
+        "star":"<:GoldStar:905915895937892403>",
+        "log":"<:log_emoji:868054485933625346>",
+        "helpEmoji":"<:KannaSip:889543061821063189>",
+        "helpCommands":"<:slash:913172347639435285>",
+        "helpButtons":"<:button:913172562001928193>",
+        "helpMenus":"<:dropdown_select:914106174754947113>",
+        "github":"<:github:888155742719328276>",
+        "plus":"<:plus:888072519582634075>",
+        "minus":"<:minus:888072653003452516>"
+    },
     "url":{
         "guild_staff_application":"URL",
         "forums_post":"URL"
@@ -32,14 +53,8 @@
     "starboard":{
         "minimumCount": 4
     },
-    "emoji":{
+    "emojify":{
         "halloween":{"e": ["🍬", "🎃", "👻", "🦇"], "desc":"Halloween emoji"},
         "christmas":{"e": ["🎄", "⛄", "🎁", "🍪"], "desc":"Christmas emoji"}
-    },
-    "repo": {
-        "maintainer":"@MCUniversity#0859",
-        "supportServerInviteCode":"whGyz8ABM5",
-        "repoUrl":"https://github.com/MCUniversity/guildbot",
-        "repoRaw":"https://raw.githubusercontent.com/MCUniversity/guildbot/main/"
     }
 }

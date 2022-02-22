@@ -40,7 +40,7 @@ module.exports = {
                                     let rank = "";
                                     if (data.player.monthlyPackageRank == "SUPERSTAR") {rank="MVP++"} else if (data.player.newPackageRank == "MVP_PLUS") {rank="MVP+"} else if (data.player.newPackageRank == "MVP") {rank="MVP"} else if (data.player.newPackageRank == "VIP_PLUS") {rank="VIP+"} else if (data.player.newPackageRank == "VIP") {rank="VIP"} else if (data.player.newPackageRank == "MVP") {rank="MVP"}
                                     let embed = new Discord.MessageEmbed()
-                                        .setColor(config.embedcolour.a)
+                                        .setColor(config.colours.main)
                                         .setTimestamp()
                                         .setTitle(`**${rank}** ${mun.pseudo} - Guild member data`)
                                         .setFooter(`uuid: ${passedData.uuid}`)

@@ -4,12 +4,20 @@ const config = require('../config.json')
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
+let permissions = undefined
+let setDef = true
+
+if (config.permissions.summon != undefined) {
+    permissions = config.permissions.summon
+    setDef = false
+}
+
 module.exports = {
     help: false,
-    permissions: [{id:config.roles.adminRole, type:1, permission:true}],
+    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('summon')
-        .setDefaultPermission(false)
+        .setDefaultPermission(setDef)
         .setDescription(`Summons a demon. Don't let Chongyun find you.`)
         .addSubcommand(command => command
             .setName('menu')
@@ -101,7 +109,7 @@ module.exports = {
                     let seconds = Math.floor(totalSeconds % 60);
                     let embed = new Discord.MessageEmbed()
                         .setTitle(`Kickwave calculation`)
-                        .setColor(config.embedcolour.b)
+                        .setColor(config.colours.secondary)
                         .setFooter(`Data last updated ${minutes}min ${seconds}sec ago.`)
                     content = "```json\n[\n"
                     let leaderBoardData = res.data

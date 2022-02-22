@@ -147,7 +147,7 @@ module.exports = {
                     }
                 }
                 await interaction.reply({
-                    content: `<:plus:888072519582634075> Applied - **${addedCounter}** roles\n<:minus:888072653003452516> Removed - **${removedCounter}** roles.`,
+                    content: `${config.emoji.plus} Applied - **${addedCounter}** roles\n${config.emoji.minus} Removed - **${removedCounter}** roles.`,
                     ephemeral: true
                 })
             }

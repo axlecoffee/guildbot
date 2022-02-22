@@ -5,7 +5,7 @@ module.exports = {
     async execute(client, interaction) {
         let message = interaction.message
         let nembed = new Discord.MessageEmbed()
-            .setColor(config.embedcolour.a)
+            .setColor(config.colours.main)
             .setTimestamp()
         if (message.channel.type == 'GUILD_TEXT' && message.channel.name.startsWith('ticket-')) {
             nembed.addField('Do you agree with the following:', `**1.** I can be active at least twice a week\n**2.** My Hypixel network level is 50 or higher\n**3.** I can contribute at least 100k guild exp per week`)
