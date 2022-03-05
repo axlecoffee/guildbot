@@ -138,7 +138,7 @@ module.exports = {
                                             interaction.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                         } else {
                                             let embed = new Discord.MessageEmbed()
-                                                .setColor('RED')
+                                                .setColor(config.colours.error)
                                                 .setTimestamp()
                                                 .setTitle(`${config.emoji.error} An error has occurred.`)
                                                 .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
@@ -148,7 +148,7 @@ module.exports = {
                                     } else {
                                         //Throw error -> User has not set their DISCORD account in game
                                         let embed = new Discord.MessageEmbed()
-                                                .setColor('RED')
+                                                .setColor(config.colours.error)
                                                 .setTimestamp()
                                                 .setTitle(`${config.emoji.error} An error has occurred.`)
                                                 .addField(`**This player\'s discord account does not match your discord account.**`, `**You need to set your discord account in the profile menu on Hypixel.**\nMake sure you entered your full discord tag (e.g. **Username#0001**).`)
@@ -157,14 +157,14 @@ module.exports = {
                                     }
                                 } else {
                                     let embed = new Discord.MessageEmbed()
-                                        .setColor('RED')
+                                        .setColor(config.colours.error)
                                         .setTimestamp()
                                         .setTitle(`${config.emoji.error} An error has occurred.`)
                                         .addField(`**${data.cause}**`, `*This probably means the API key is invalid. Ping <@299265668522442752>.*`)
                                     interaction.reply({embeds: [embed], allowedMentions: { repliedUser: false }})
                                     setTimeout(() => {interaction.deleteReply()}, 15000);
                                     let logembed = new Discord.MessageEmbed()
-                                        .setColor('RED')
+                                        .setColor(config.colours.error)
                                         .setTimestamp()
                                         .setTitle(`${config.emoji.error} ERROR`)
                                         .addField(`**Cause: **`, `A player ran a bot command and the Hypixel API key provided by the config file was invalid.`)
@@ -181,7 +181,7 @@ module.exports = {
     
                     } else {
                         let embed = new Discord.MessageEmbed()
-                            .setColor('RED')
+                            .setColor(config.colours.error)
                             .setTimestamp()
                             .setTitle(`${config.emoji.error} An error has occurred.`)
                             .addField(`**A Mojang API error occurred**`, `*This probably means the username you entered does not exist.*`)

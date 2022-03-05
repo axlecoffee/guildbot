@@ -18,6 +18,12 @@ Variables that must be created in order for the bot to function:
 
 **"MONGO_URL"** - contains the URL of your MongoDB server. You must include the database name after the URL so the project knows where to save data (e.g. mongodb://localhost:27017/guildbot; mongodb://localhost:27017/ being the URL and guildbot the database name.)
 
+**"MC_ACC_USERNAME"** - contains the email address of the minecraft account used for the guild chat bridge feature of the bot.
+
+**"MC_ACC_PASSWORD"** - contains the password of the minecraft account used for the guild chat bridge feature of the bot.
+
+**"MC_ACC_AUTHSERVER"** - specifies the auth server that the bot should use when logging in to the minecraft account. If the account is not migrated (a mojang account), use "mojang". If the account is migrated (to a microsoft account), use "microsoft".
+
 ## Additional confirugation - config.json file
 
 The **config.json** file is used for saving less sesitive configuration data.
@@ -60,7 +66,7 @@ The **config.json** file is used for saving less sesitive configuration data.
         }
     },
     "emoji": {
-        "warning": "<:warning_emoji:868054485992357948>",
+        "warning":"<:warning_emoji:868054485992357948>",
         "error":"<:error_emoji:868054485946224680>",
         "star":"<:GoldStar:905915895937892403>",
         "log":"<:log_emoji:868054485933625346>",
@@ -72,12 +78,25 @@ The **config.json** file is used for saving less sesitive configuration data.
         "plus":"<:plus:888072519582634075>",
         "minus":"<:minus:888072653003452516>"
     },
+    "chatbridge":{
+        "enabled":BOOLEAN,
+        "channelId": "DISCORDID",
+        "webhook": "URL",
+        "messagelogging": {
+            "enabled":BOOLEAN,
+            "channelId": "DISCORDID"
+        },
+        "relogOnKick": {
+            "enabled": BOOLEAN,
+            "relogAmount": NUMBER
+        }
+    },
     "url":{
         "guild_staff_application":"URL",
         "forums_post":"URL"
     },
     "starboard":{
-        "minimumCount": 4
+        "minimumCount": NUMBER
     },
     "emojify":{
         "halloween":{"e": ["🍬", "🎃", "👻", "🦇"], "desc":"Halloween emoji"},
@@ -95,7 +114,7 @@ The **config.json** file is used for saving less sesitive configuration data.
 
 **roles** is an object containing ID's of various discord roles.
 
-- **guildMemberRole** is the role a guild member recieves when their application is accepted.
+- **guildMemberRole** is the role a guild member receives when their application is accepted.
 
 - **helpers** are the roles that get pinged when an application is accepted so they can invite the member.
 
@@ -126,7 +145,7 @@ For more complex configuration check the module's [repository on npmjs.com](http
 
 - **logChannelId** - channel used for general logs.
 
-- **appChannelId** - channel used for membership application logs. Can be the same or seperate as the default log channel.
+- **appChannelId** - channel used for membership application logs. Can be the same or separate as the default log channel.
 
 - **queueChannelId** - channel used for the invite queue feature - when a member is to be invited, a message gets sent in this channel with their name and an easy to copy command for staff members to use. After they are invited, the message for that member can be easily deleted via a button.
 
@@ -143,6 +162,18 @@ For more complex configuration check the module's [repository on npmjs.com](http
 - **forums_post** is the guild's forums post. This is linked when a ticket is created.
 
 **emoji** contains a list of various custom discord emoji you can change to your prefrence, if your bot does not have access to view the default ones.
+
+**chatbridge** is a list of configuration options regarding the two way discord-minecraft chat bridge for the guild. This option requires a separate minecraft account so that the bot can be in the guild at all times sitting in limbo watching guildchat and relaying messages between /gc and a channel in your discord server.
+
+- **enabled** a boolean (true/false) that enables and disables the feature
+
+- **channelId** is the ID of the discord channel you want to use for your chat bridge
+
+- **webhook** is the URL of the webhook used for the chat bridge. The webhook must be within the channel defined in channelId for this feature to work properly.
+
+- **messagelogging** allows you to log all raw messages to a channel. Should really only be used for debugging.
+
+- **relogOnKick** allows the bot to re-login **relogAmount** of times after getting kicked from the server. The **relogAmount** limit exists to stop the account from getting accidentally banned for spam-logins in case some error occurs.
 
 **starboard** contains configuration options for the starboard feature
 
@@ -164,4 +195,4 @@ You could alternatively also use [MongoDB atlas](https://www.mongodb.com/atlas).
 
 The project uses [the official MongoDB module](https://www.npmjs.com/package/mongodb) to interact with the database.
 
-The URL to the installation of the DB must contain the name of the database for it to function (check the Enviromental variables section for more info)
+The URL to the installation of the DB must contain the name of the database for it to function (check the Environmental variables section for more info)

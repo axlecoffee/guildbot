@@ -46,12 +46,25 @@
         "plus":"<:plus:888072519582634075>",
         "minus":"<:minus:888072653003452516>"
     },
+    "chatbridge":{
+        "enabled":BOOLEAN,
+        "channelId": "DISCORDID",
+        "webhook": "URL",
+        "messagelogging": {
+            "enabled":BOOLEAN,
+            "channelId": "DISCORDID"
+        },
+        "relogOnKick": {
+            "enabled": BOOLEAN,
+            "relogAmount": NUMBER
+        }
+    },
     "url":{
         "guild_staff_application":"URL",
         "forums_post":"URL"
     },
     "starboard":{
-        "minimumCount": 4
+        "minimumCount": NUMBER
     },
     "emojify":{
         "halloween":{"e": ["🍬", "🎃", "👻", "🦇"], "desc":"Halloween emoji"},

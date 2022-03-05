@@ -4,8 +4,6 @@ const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const config = require('./config.json')
 const pkg = require('./package.json')
-const os = require('os')
-const fs = require('fs')
 const Discord = require('discord.js')
 const { colours } = require('./consoleFormatting.js')
 const { compare } = require('compare-versions')
@@ -26,7 +24,7 @@ module.exports = {
                 let channel = client.channels.cache.get(config.channels.logChannelId)
                 if (compare(pkg.version.toString(), packageData.version.toString(), ">")) {
                     let embed = new Discord.MessageEmbed()
-                        .setColor('YELLOW')
+                        .setColor(config.colours.warning)
                         .setTimestamp()
                         .addField(`${config.emoji.warning} Warning!`, `You are running either an unreleased or a misconfigured version of GuildBot. \nOnly proceed if you are sure you know what you're doing. \nIf not, contact ${pkg.author} about this or post an issue on the github repository: ${pkg.repository.url}.`)
                     channel.send({
@@ -35,7 +33,7 @@ module.exports = {
                     console.warn(`${colours.reset}${colours.fg.yellow}You are running either an unreleased or a misconfigured version of GuildBot. Only proceed if you are sure you know what you're doing. If not, contact ${pkg.author} about this or post an issue on the github repository: ${pkg.repository.url}.${colours.reset}`)
                 } else if (compare(pkg.version.toString(), packageData.version.toString(), "<")) {
                     let embed = new Discord.MessageEmbed()
-                        .setColor('YELLOW')
+                        .setColor(config.colours.warning)
                         .setTimestamp()
                         .addField(`${config.emoji.warning} Warning!`, `A new version of GuildBot is available!\n**${pkg.version} => ${packageData.version}**\nDownload it now at ${pkg.repository.url}`)
                     channel.send({
@@ -75,7 +73,7 @@ module.exports = {
                                 nameData += data_chunk;
                             })
                             memberdata.on('end', () => {
-                                if (nameData != "Player not found !") {
+                                if (!(nameData.startsWith("<") || nameData == "Player not found !")) {
                                     mun = JSON.parse(nameData)
                                     dates = Object.keys(member.expHistory)
                                     let avgExp = 0;
@@ -139,6 +137,17 @@ module.exports = {
         }).on("error", (err) => {
             return console.error(err);
         })
+    },
+    mineflayerConfig() {
+        let obj = {
+            host: "mc.hypixel.net",
+            version: "1.8",
+            username: process.env.MC_ACC_USERNAME.toString(),
+            password: process.env.MC_ACC_PASSWORD.toString(),
+            auth: process.env.MC_ACC_AUTHSERVER.toString(),
+            hideErrors: true
+        }
+        return obj;
     },
     statistics: {
         async increaseButtonCount() {

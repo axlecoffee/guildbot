@@ -12,7 +12,7 @@ module.exports = {
             components: []
         });
         const logembed = new Discord.MessageEmbed()
-            .setColor("RED")
+            .setColor(config.colours.error)
             .setTimestamp()
             .setAuthor(interaction.user.tag)
             .setThumbnail(interaction.user.displayAvatarURL())

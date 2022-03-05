@@ -1,17 +1,19 @@
 require('dotenv').config()
-const logging = require('./consoleFormatting.js'); logging.log(); logging.warn(); logging.error(); logging.info(); //console.log('log'); console.warn('warn'); console.error('error'); console.info('info'); //For testing
+//const logging = require('./consoleFormatting.js'); logging.log(); logging.warn(); logging.error(); logging.info(); //console.log('log'); console.warn('warn'); console.error('error'); console.info('info'); //For testing
 const fs = require('fs');
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
+MongoClient.connect()
+let db = MongoClient.db()
 const functions = require('./functions.js')
 const https = require('https')
 const schedule = require('node-schedule');
-
+const fetch = require('node-fetch')
+const mineflayer = require('mineflayer')
 const Discord = require("discord.js")
 const allIntents = new Discord.Intents(32767); const client = new Discord.Client({ intents: allIntents }); //Uses all intents. The bot runs in a single server so it does not matter.
-
 const config = require('./config.json')
-
+const mineflayerconfig = functions.mineflayerConfig()
 client.on('error', async (err) => {
     const channel = await client.channels.cache.get(config.channels.logChannelId)
     const embed = new Discord.MessageEmbed()
@@ -24,12 +26,10 @@ client.on('error', async (err) => {
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    await MongoClient.connect();
-    const db = MongoClient.db();
     db.collection('starboard').findOne({}, async function (err, res) {
         if (err) throw err;
         if (res != undefined) {
-            db.collection('starboard').drop().then(() => MongoClient.close())
+            db.collection('starboard').drop()
         }
     })
     if (client.user.id == "886676473019269160") {
@@ -75,8 +75,6 @@ client.on('interactionCreate', async (interaction) => {
             command: interaction.commandName
         }
         if (command.cooldown) {
-            await MongoClient.connect()
-            const db = MongoClient.db()
             await db.collection('cooldown').findOne(qfilter, async function (err, res) {
                 if (err) throw err;
                 let nextAvailable;
@@ -102,7 +100,7 @@ client.on('interactionCreate', async (interaction) => {
                                     value: now + command.cooldown
                                 }, function (err, res) {
                                     if (err) throw err;
-                                    MongoClient.close()
+                                    
                                     return;
                                 })
                             } else {
@@ -111,7 +109,7 @@ client.on('interactionCreate', async (interaction) => {
                                         value: now + command.cooldown
                                     }
                                 })
-                                MongoClient.close()
+                                
                                 return;
                             }
                         })        
@@ -155,8 +153,6 @@ client.on('guildMemberRemove', async (member) => {
 client.on('messageCreate', async (message) => {
     if (message.guild.id != config.discordGuildId) return;
     if (message.channel.type == 'GUILD_TEXT' && message.channel.name.startsWith('ticket-') && !message.author.bot) {
-        await MongoClient.connect()
-        let db = MongoClient.db()
         db.collection('tickets').findOne({ sid: 'ticket_introduction_message', discord_id: message.author.id }, async function(err, res){
             if (err) throw err;
             if (res == undefined) {
@@ -169,8 +165,6 @@ client.on('messageCreate', async (message) => {
                 await message.reply({
                     embeds: [embed],
                     ephemeral: true
-                }).then(async () => {
-                    await MongoClient.close()
                 })
             }
         })
@@ -236,8 +230,6 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
                 embed.setImage(attachment.url)
             }
         }
-        await MongoClient.connect()
-        const db = MongoClient.db()
         let qfilter = {messageid: message.id}
         db.collection('starboard').findOne(qfilter, async function (err, res) {
             if (res == undefined) {
@@ -245,7 +237,7 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
                 starboard.send({embeds: [embed]}).then(async (msg) => {
                     db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
                         if (err) throw err;
-                        MongoClient.close()
+                        
                     })
                 })
             } else {
@@ -257,7 +249,7 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
                 } catch (err) {
                     console.error(err)
                 }
-                MongoClient.close()
+                
             }
         })
     }
@@ -279,8 +271,6 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
                 embed.setImage(attachment.url)
             }
         }
-        await MongoClient.connect()
-        const db = MongoClient.db()
         let qfilter = {messageid: message.id}
         db.collection('starboard').findOne(qfilter, async function (err, res) {
             if (err) throw err;
@@ -289,7 +279,7 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
                 starboard.send({embeds: [embed]}).then(async (msg) => {
                     db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
                         if (err) throw err;
-                        MongoClient.close()
+                        
                     })
                 })
             } else {
@@ -301,13 +291,120 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
                 } catch (err) {
                     console.error(err)
                 }
-                MongoClient.close()
+                
             }
         })
     }
 })
 
+const leaderboardDataUpdateJob = schedule.scheduleJob(config.scheduledEvents.leaderboardDataUpdate, function(){functions.leaderboardDataUpdate(client)});
 
 client.login(process.env.TOKEN)
 
-const leaderboardDataUpdateJob = schedule.scheduleJob(config.scheduledEvents.leaderboardDataUpdate, function(){functions.leaderboardDataUpdate(client)});
+if (config.chatbridge.enabled) {
+    let bindEvents = function(mclient){
+        mclient.on('login', () => {
+            client.channels.fetch(config.channels.logChannelId).then(channel => {
+                let embed = new Discord.MessageEmbed()
+                    .setColor(config.colours.success)
+                    .setTimestamp()
+                    .setTitle(`${config.emoji.log} LOG`)
+                    .addField('ChatBridge - Connection Successfull', `Successfully logged in to hypixel as **${mclient.username}**.`)
+                if (config.chatbridge.relogOnKick.enabled) {
+                    
+                    
+                    db.collection('chatbridge').findOne({ sid: 'onKickRelog' }, async function(err, res){
+                        if (err) throw err;
+                        embed.addField(`Remaining re-login attempts`, `Remaining attempts of logging in after getting kicked: **${res.relogAmount}**`)
+                        channel.send({embeds:[embed]})
+                        
+                        return;
+                    })
+                } else {
+                    channel.send({embeds:[embed]})
+                }
+            })
+        })
+        mclient.on('kicked', (reason, loggedIn) => {
+            client.channels.fetch(config.channels.logChannelId).then(channel => {
+                let embed = new Discord.MessageEmbed()
+                    .setColor(config.colours.success)
+                    .setTimestamp()
+                    .setTitle(`${config.emoji.log} LOG`)
+                    .addField('ChatBridge - Bot kicked', `ChatBridge bot **${mclient.username}** has been kicked from hypixel:\n**${reason}**`)
+                channel.send({embeds:[embed]})
+            })
+            if (config.chatbridge.relogOnKick.enabled) {
+                
+                
+                db.collection('chatbridge').findOne({ sid: 'onKickRelog' }, async function(err, res){
+                    if (err) throw err;
+                    if (res.relogAmount>0) {
+                        await db.collection('chatbridge').updateOne({ sid: 'onKickRelog' }, {$set: { relogAmount: res.relogAmount-1 }})
+                        mclient = mineflayer.createBot(mineflayerconfig)
+                        bindEvents(mclient)
+                    }
+                    
+                    return;
+                })
+            }
+        })
+        mclient.on('messagestr', async (message) => {
+            let spacex = new RegExp('^( )*$')
+            if (spacex.test(message)) return;
+            if (config.chatbridge.messagelogging.enabled) {
+                client.channels.fetch(config.chatbridge.messagelogging.channelId).then(channel => {
+                    let msg = message.replace(/<@.*>/g, "")
+                    if (msg.length >= 1) {
+                        channel.send({content:`\`\`${msg}\`\``})
+                    }
+                })
+            }
+            //let dmex = new RegExp('^From .+: ')
+            let gex = new RegExp('^Guild > .+: ')
+            if (gex.test(message)) {
+                let part = message.match(gex)[0]
+                let msg = message.replace(gex, "").replace(/<@.*>/g, "")
+                if (msg.length < 1) return;
+                let namearr = part.replace(/^Guild > /, "").split(" ")
+                let name = namearr[0]
+                if (namearr[0].startsWith('[')) name = namearr[1]
+                name = name.replace(/: ?$/, "")
+                if (name != mclient.username) {
+                    const response = await fetch(`https://minecraft-api.com/api/uuid/${name}/json`)
+                    const namedata = await response.json()
+                    chatbridgehook.send({
+                        'username': name,
+                        'content': msg,
+                        'avatarURL': `https://crafatar.com/renders/head/${namedata.uuid}`
+                    })
+                }
+            }
+        })
+    }
+    
+    const chatbridgehook = new Discord.WebhookClient({url: config.chatbridge.webhook})
+    let mclient = mineflayer.createBot(mineflayerconfig)
+    if (config.chatbridge.relogOnKick.enabled) {
+        mclient.once('login', () => {
+            db.collection('chatbridge').findOne({ sid: 'onKickRelog' }, async function (err, res) {
+                if (err) throw err;
+                if (res == null) {
+                    db.collection('chatbridge').insertOne({ sid: 'onKickRelog', relogAmount: config.chatbridge.relogOnKick.relogAmount }, function (err, res) {
+                        if (err) throw err;
+                        return;
+                    })
+                } else {
+                    await db.collection('chatbridge').updateOne({ sid: 'onKickRelog' }, {$set: { relogAmount: config.chatbridge.relogOnKick.relogAmount }})
+                    return;
+                }
+            })
+        })
+    }
+    client.on('messageCreate', message => {
+        if (message.channel.id === config.chatbridge.channelId && !message.author.bot && message.author) {
+            mclient.chat(`/gc ${message.member.displayName}: ${message.content}`)
+        }
+    })
+    bindEvents(mclient)
+}

@@ -23,7 +23,7 @@ module.exports = {
             }
             if (userData == undefined) {
                 let undefinedEmbed = new Discord.MessageEmbed()
-                    .setColor("RED")
+                    .setColor(config.colours.error)
                     .setTimestamp()
                     .addField(`${config.emoji.error} Minecraft account not linked!`, "Your minecraft account is not linked to your discord account. You can fix this by running the **/link update** command.")
                 let linkHelpButton = new Discord.MessageButton()
@@ -69,7 +69,7 @@ module.exports = {
                                 });
     
                                 const logembed = new Discord.MessageEmbed()
-                                    .setColor("GREEN")
+                                    .setColor(config.colours.success)
                                     .setTimestamp()
                                     .setAuthor(interaction.user.tag)
                                     .setThumbnail(interaction.user.displayAvatarURL())
@@ -106,7 +106,7 @@ module.exports = {
                                     components: []
                                 });
                                 const logembed = new Discord.MessageEmbed()
-                                    .setColor("RED")
+                                    .setColor(config.colours.error)
                                     .setTimestamp()
                                     .setAuthor(interaction.user.tag)
                                     .setThumbnail(interaction.user.displayAvatarURL())
@@ -118,7 +118,7 @@ module.exports = {
                             }
                         } else {
                             let embed = new Discord.MessageEmbed()
-                                .setColor('RED')
+                                .setColor(config.colours.error)
                                 .setTimestamp()
                                 .setTitle(`${config.emoji.error} An error has occurred.`)
                                 .addField(`**${data.cause}**`, `*This probably means the API key is invalid. Ping <@299265668522442752>.*`)
@@ -133,7 +133,7 @@ module.exports = {
                                 message.delete()
                             }, 15000);
                             let logembed = new Discord.MessageEmbed()
-                                .setColor('RED')
+                                .setColor(config.colours.error)
                                 .setTimestamp()
                                 .setTitle(`${config.emoji.error} ERROR`)
                                 .addField(`**Cause: **`, `A player ran a bot command and the Hypixel API key provided by the config file was invalid.`)
