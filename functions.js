@@ -149,6 +149,11 @@ module.exports = {
         }
         return obj;
     },
+    hypixelUtil: {
+        networkLevelFromExp(exp) {
+            return (Math.sqrt((2 * parseInt(exp)) + 30625) / 50) - 2.5
+        }
+    },
     statistics: {
         async increaseButtonCount() {
             await MongoClient.connect()

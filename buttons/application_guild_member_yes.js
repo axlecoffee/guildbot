@@ -48,9 +48,9 @@ module.exports = {
                     res.on('end', async () => {
                         data = JSON.parse(data_raw)
                         if (data.success == true) {
-                            networkLevel = Math.round((Math.sqrt((2 * parseInt(data.player.networkExp)) + 30625) / 50) - 2.5)
-                            networkLevelRaw = (Math.sqrt((2 * parseInt(data.player.networkExp)) + 30625) / 50) - 2.5
-                            if (networkLevel >= 50) {
+                            networkLevelRaw = functions.hypixelUtil.networkLevelFromExp(data.player.networkExp)
+                            networkLevel = Math.round(networkLevelRaw)
+                            if (networkLevel >= config.guildAppReqs.minNetworkLevel) {
                                 let sucessembed = new Discord.MessageEmbed()
                                     .setColor(config.colours.main)
                                     .setTimestamp()

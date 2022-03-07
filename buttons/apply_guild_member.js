@@ -8,7 +8,12 @@ module.exports = {
             .setColor(config.colours.main)
             .setTimestamp()
         if (message.channel.type == 'GUILD_TEXT' && message.channel.name.startsWith('ticket-')) {
-            nembed.addField('Do you agree with the following:', `**1.** I can be active at least twice a week\n**2.** My Hypixel network level is 50 or higher\n**3.** I can contribute at least 100k guild exp per week`)
+            let reqString = "";
+            for (let i = 0;i<config.guildAppReqs.textReqs.length;i++) {
+                reqString+=`**${i+1}.** ${config.guildAppReqs.textReqs[i]}\n`;
+            }
+            if (config.guildAppReqs.minNetworkLevel > 0) reqString+=`\n*This guild enforces **a minimum network level requirement**. To join this guild, your [hypixel network level](https://hypixel.fandom.com/wiki/Network_Levels) must be at the very least **${config.guildAppReqs.minNetworkLevel}**.*`
+            nembed.addField('Do you agree with the following:', reqString)
                 let yesbutton = new Discord.MessageButton()
                     .setStyle(1)
                     .setEmoji('865975626774609920') //865887075509338122

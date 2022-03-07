@@ -63,6 +63,14 @@
         "guild_staff_application":"URL",
         "forums_post":"URL"
     },
+    "guildAppReqs":{
+        "textReqs": [
+            STRING,
+            STRING,
+            ...
+        ],
+        "minNetworkLevel": NUMBER
+    },
     "starboard":{
         "minimumCount": NUMBER
     },
