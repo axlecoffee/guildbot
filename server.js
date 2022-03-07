@@ -354,7 +354,7 @@ if (config.chatbridge.enabled) {
             if (spacex.test(message)) return;
             if (config.chatbridge.messagelogging.enabled) {
                 client.channels.fetch(config.chatbridge.messagelogging.channelId).then(channel => {
-                    let msg = message.replace(/<@.*>/g, "")
+                    let msg = message.replace(/<@.*>/g, "").replace(/(@everyone)|(@here)/g, "")
                     if (msg.length >= 1) {
                         channel.send({content:`\`\`${msg}\`\``})
                     }
@@ -364,7 +364,7 @@ if (config.chatbridge.enabled) {
             let gex = new RegExp('^Guild > .+: ')
             if (gex.test(message)) {
                 let part = message.match(gex)[0]
-                let msg = message.replace(gex, "").replace(/<@.*>/g, "")
+                let msg = message.replace(gex, "").replace(/<@.*>/g, "").replace(/(@everyone)|(@here)/g, "")
                 if (msg.length < 1) return;
                 let namearr = part.replace(/^Guild > /, "").split(" ")
                 let name = namearr[0]

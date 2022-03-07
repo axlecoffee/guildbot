@@ -12,5 +12,6 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}`)
     let guild = await client.guilds.fetch(config.discordGuildId)
     console.log(`Deleting ${guild.commands.size} commands`)
-    guild.commands.set([]).then(console.log)
+    await guild.commands.set([]).then(console.log)
+    client.destroy()
 })
