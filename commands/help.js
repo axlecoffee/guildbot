@@ -24,11 +24,11 @@ module.exports = {
     async execute(client, interaction) {
         let buttonFoward = new Discord.MessageButton()
             .setStyle(2)
-            .setEmoji('▶️')
+            .setEmoji(config.emoji.arrowRight)
             .setCustomId('help_menu_1')
         let buttonBackwards = new Discord.MessageButton()
             .setStyle(2)
-            .setEmoji('◀️')
+            .setEmoji(config.emoji.arrowLeft)
             .setCustomId('help_menu_backwards')
             .setDisabled(true)
         let row = new Discord.MessageActionRow()

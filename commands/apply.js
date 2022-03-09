@@ -18,13 +18,13 @@ module.exports = {
         .setDescription(`List of available guild applications.`),
     async execute(client, interaction) {
         let guildmemberbutton = new Discord.MessageButton()
-            .setStyle(1)
-            .setEmoji('📇')
+            .setStyle(2)
+            .setEmoji(config.emoji.applyCommandMembership)
             .setLabel('Guild membership application')
             .setCustomId('apply_guild_member')
         let guildstaffbutton = new Discord.MessageButton()
-            .setStyle(1)
-            .setEmoji('👮')
+            .setStyle(2)
+            .setEmoji(config.emoji.applyCommandStaff)
             .setLabel('Staff application')
             .setCustomId('apply_guild_staff')
         let row = new Discord.MessageActionRow()

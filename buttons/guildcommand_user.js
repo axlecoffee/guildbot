@@ -49,11 +49,11 @@ module.exports = {
                     if (lastLogin) {embed.addField("Last login: ", `${lastLogin}`, true)}
                     if (lastSeen) {embed.addField("Last seen: ", `${lastSeen}`, true)} 
                 let memberButton = new Discord.MessageButton()
-                    .setStyle(1)
+                    .setStyle(2)
                     .setLabel('Guild member data')
                     .setCustomId('guildcommand_member')
                 let userButton = new Discord.MessageButton()
-                    .setStyle(1)
+                    .setStyle(2)
                     .setLabel('User data')
                     .setCustomId('guildcommand_user')
                     .setDisabled(true)

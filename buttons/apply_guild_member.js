@@ -15,13 +15,13 @@ module.exports = {
             if (config.guildAppReqs.minNetworkLevel > 0) reqString+=`\n*This guild enforces **a minimum network level requirement**. To join this guild, your [hypixel network level](https://hypixel.fandom.com/wiki/Network_Levels) must be at the very least **${config.guildAppReqs.minNetworkLevel}**.*`
             nembed.addField('Do you agree with the following:', reqString)
                 let yesbutton = new Discord.MessageButton()
-                    .setStyle(1)
-                    .setEmoji('865975626774609920') //865887075509338122
+                    .setStyle(2)
+                    .setEmoji(config.emoji.yes) //865887075509338122
                     .setLabel('Yes')
                     .setCustomId('application_guild_member_yes')
                 let nobutton = new Discord.MessageButton()
-                    .setStyle(1)
-                    .setEmoji('865975626325295135') //865887075491643402
+                    .setStyle(2)
+                    .setEmoji(config.emoji.no) //865887075491643402
                     .setLabel('No')
                     .setCustomId('application_guild_member_no')
                 let row = new Discord.MessageActionRow()

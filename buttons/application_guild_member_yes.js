@@ -27,7 +27,7 @@ module.exports = {
                     .setTimestamp()
                     .addField(`${config.emoji.error} Minecraft account not linked!`, "Your minecraft account is not linked to your discord account. You can fix this by running the **/link update** command.")
                 let linkHelpButton = new Discord.MessageButton()
-                    .setStyle(1)
+                    .setStyle(2)
                     .setEmoji('ℹ️')
                     .setLabel('Learn more.')
                     .setCustomId('link_help_button')

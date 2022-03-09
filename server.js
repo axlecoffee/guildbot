@@ -190,7 +190,7 @@ client.on('channelCreate', async (channel) => {
                 .setDescription('If you are here to apply for guild membership:\nBefore you may apply, you must link your minecraft account to your discord account. Press the button to learn more.')
                 .setTimestamp()
             let linkHelpButton = new Discord.MessageButton()
-                .setStyle(1)
+                .setStyle(2)
                 .setEmoji('ℹ️')
                 .setLabel('Learn more.')
                 .setCustomId('link_help_button')
