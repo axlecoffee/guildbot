@@ -6,7 +6,6 @@ const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 MongoClient.connect()
 let db = MongoClient.db()
 const functions = require('./functions.js')
-const https = require('https')
 const schedule = require('node-schedule');
 const fetch = require('node-fetch')
 const mineflayer = require('mineflayer')
@@ -406,5 +405,7 @@ if (config.chatbridge.enabled) {
             mclient.chat(`/gc ${message.member.displayName}: ${message.content}`)
         }
     })
-    bindEvents(mclient)
+    setTimeout(() => {
+        bindEvents(mclient)
+    }, 500)
 }
