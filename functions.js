@@ -27,14 +27,17 @@ module.exports = {
             })
             console.warn(`${colours.reset}${colours.fg.yellow}You are running either an unreleased or a misconfigured version of GuildBot. Only proceed if you are sure you know what you're doing. If not, contact ${pkg.author} about this or post an issue on the github repository: ${pkg.repository.url}.${colours.reset}`)
         } else if (compare(pkg.version.toString(), packageData.version.toString(), "<")) {
+            let githubApiDataRaw = await fetch(pkg.repository.urlApi + "/releases")
+            let githubApiData = await githubApiDataRaw.json()
+            let versionsBehind = githubApiData.findIndex(release => compare(release.tag_name.toString(), pkg.version.toString(), "=") === true)
             let embed = new Discord.MessageEmbed()
                 .setColor(config.colours.warning)
                 .setTimestamp()
-                .addField(`${config.emoji.warning} Warning!`, `A new version of GuildBot is available!\n**${pkg.version} => ${packageData.version}**\nDownload it now at ${pkg.repository.url}`)
+                .addField(`${config.emoji.warning} Warning!`, `A new version of GuildBot is available!\n**${pkg.version} => ${packageData.version}**\nYou are **${versionsBehind}** updates behind the latest update.\nDownload it now at ${githubApiData[0].html_url}`)
             channel.send({
                 embeds: [embed]
             })
-            console.info(`${colours.reset}${colours.fg.yellow}A new version of GuildBot is available!\n${colours.bright}${pkg.version} => ${packageData.version}\n${colours.reset}${colours.fg.yellow}Download it now at ${pkg.repository.url}${colours.reset}`)
+            console.info(`${colours.reset}${colours.fg.yellow}A new version of GuildBot is available!\n${colours.bright}${pkg.version} => ${packageData.version}\n${colours.reset}${colours.fg.yellow}You are ${colours.bright}${versionsBehind}${colours.reset}${colours.fg.yellow} updates behind the latest update.\n${colours.reset}${colours.fg.yellow}Download it now at ${githubApiData[0].html_url}${colours.reset}`)
         } else if (compare(pkg.version.toString(), packageData.version.toString(), "=")) {
             console.log(`${colours.fg.white}No updates available. You are running the latest version of GuildBot: ${colours.bright}${pkg.version}${colours.reset}`)
         }
@@ -53,9 +56,7 @@ module.exports = {
             let channel = await client.channels.fetch(config.channels.memberCount.guild)
             channel.setName(`📊Guild Members: ${count}📊`)
             for (const member of hGuild.guild.members) {
-                //let fetchNameData = await fetch(`https://minecraft-api.com/api/pseudo/${member.uuid}/json`)
-                let nameData = await fetch(`https://minecraft-api.com/api/pseudo/${member.uuid}/json`)//await fetchNameData.json()
-                //if (!(nameData.startsWith("<") || nameData == "Player not found !")) {
+                let nameData = await fetch(`https://minecraft-api.com/api/pseudo/${member.uuid}/json`)
                     let mun = undefined;
                     try {mun = await nameData.json()} catch(err){console.error}
                     if (mun) {

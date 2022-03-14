@@ -22,6 +22,7 @@
   },
   "repository": {
     "url": "https://github.com/MCUniversity/guildbot",
+    "urlApi": "https://api.github.com/repos/MCUniversity/guildbot",
     "urlRaw": "https://raw.githubusercontent.com/MCUniversity/guildbot/main/"
   },
   "license": "GPL-3.0"

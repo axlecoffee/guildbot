@@ -370,8 +370,9 @@ if (config.chatbridge.enabled) {
                 if (namearr[0].startsWith('[')) name = namearr[1]
                 name = name.replace(/: ?$/, "")
                 if (name != mclient.username) {
-                    const response = await fetch(`https://minecraft-api.com/api/uuid/${name}/json`)
-                    const namedata = await response.json()
+                    let response = await fetch(`https://minecraft-api.com/api/uuid/${name}/json`)
+                    let namedata = {uuid: undefined};
+                    try{namedata = await response.json()}catch(err){console.error}
                     chatbridgehook.send({
                         'username': name,
                         'content': msg,
