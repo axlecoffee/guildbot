@@ -111,8 +111,9 @@ module.exports = {
                     await interaction.reply({
                         content: "Success.",
                         ephemeral: true
-                    }).then(() => {MongoClient.close()})
+                    })
                 }
+                MongoClient.close()
             })
         } else if (interaction.options.getSubcommand() == 'message') {
             let text = interaction.options.getString('text').replaceAll('\\n', '\n')

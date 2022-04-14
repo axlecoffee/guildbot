@@ -3,8 +3,6 @@ const logging = require('./consoleFormatting.js'); logging.log(); logging.warn()
 const fs = require('fs');
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
-MongoClient.connect()
-let db = MongoClient.db()
 const functions = require('./functions.js')
 const schedule = require('node-schedule');
 const fetch = require('node-fetch')
@@ -25,10 +23,13 @@ client.on('error', async (err) => {
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    MongoClient.connect()
+    let db = MongoClient.db()
     db.collection('starboard').findOne({}, async function (err, res) {
         if (err) throw err;
         if (res != undefined) {
-            db.collection('starboard').drop()
+            await db.collection('starboard').drop()
+            MongoClient.close()
         }
     })
     if (client.user.id == "886676473019269160") {
@@ -74,53 +75,50 @@ client.on('interactionCreate', async (interaction) => {
             command: interaction.commandName
         }
         if (command.cooldown) {
-            await db.collection('cooldown').findOne(qfilter, async function (err, res) {
-                if (err) throw err;
-                let nextAvailable;
-                if (res != null) {
-                    nextAvailable = res.value;
-                }
-                if (nextAvailable == undefined) nextAvailable = 0;
-                if (nextAvailable - now > 0) {
-                    await interaction.reply({
-                        content: `**Command on cooldown! Please wait *${(nextAvailable-now)/1000}* more seconds.**`,
+            MongoClient.connect()
+            let db = MongoClient.db()
+            let nextAvailable = await db.collection('cooldown').findOne(qfilter)
+            if (nextAvailable == undefined) nextAvailable = 0;
+            if (nextAvailable - now > 0) {
+                await interaction.reply({
+                    content: `**Command on cooldown! Please wait *${(nextAvailable-now)/1000}* more seconds.**`,
+                    ephemeral: true
+                });
+                MongoClient.close()
+            } else {
+                try {
+                    await command.execute(client, interaction);
+                    const db = MongoClient.db()
+                    db.collection('cooldown').findOne(qfilter, async function (err, res) {
+                        if (err) throw err;
+                        if (res == null) {
+                            db.collection('cooldown').insertOne({
+                                guildid: interaction.guild.id,
+                                command: interaction.commandName,
+                                value: now + command.cooldown
+                            }, function (err, res) {
+                                if (err) throw err;
+                                MongoClient.close()
+                                return;
+                            })
+                        } else {
+                            await db.collection('cooldown').updateOne(qfilter, {
+                                $set: {
+                                    value: now + command.cooldown
+                                }
+                            })
+                            MongoClient.close()
+                            return;
+                        }
+                    })        
+                } catch (error) {
+                    console.error(error);
+                    return interaction.reply({
+                        content: '**There was an error while executing this command!**\n*No more info is available.*',
                         ephemeral: true
                     });
-                } else {
-                    try {
-                        await command.execute(client, interaction);
-                        const db = MongoClient.db()
-                        db.collection('cooldown').findOne(qfilter, async function (err, res) {
-                            if (err) throw err;
-                            if (res == null) {
-                                db.collection('cooldown').insertOne({
-                                    guildid: interaction.guild.id,
-                                    command: interaction.commandName,
-                                    value: now + command.cooldown
-                                }, function (err, res) {
-                                    if (err) throw err;
-                                    
-                                    return;
-                                })
-                            } else {
-                                await db.collection('cooldown').updateOne(qfilter, {
-                                    $set: {
-                                        value: now + command.cooldown
-                                    }
-                                })
-                                
-                                return;
-                            }
-                        })        
-                    } catch (error) {
-                        console.error(error);
-                        return interaction.reply({
-                            content: '**There was an error while executing this command!**\n*No more info is available.*',
-                            ephemeral: true
-                        });
-                    }
                 }
-            })
+            }
         } else {
             try {
                 await command.execute(client, interaction);
@@ -152,21 +150,22 @@ client.on('guildMemberRemove', async (member) => {
 client.on('messageCreate', async (message) => {
     if (message.guild.id != config.discordGuildId) return;
     if (message.channel.type == 'GUILD_TEXT' && message.channel.name.startsWith('ticket-') && !message.author.bot) {
-        db.collection('tickets').findOne({ sid: 'ticket_introduction_message', discord_id: message.author.id }, async function(err, res){
-            if (err) throw err;
-            if (res == undefined) {
-                await db.collection('tickets').insertOne({ sid: 'ticket_introduction_message', discord_id: message.author.id })
-                const embed = new Discord.MessageEmbed()
-                    .setTitle(`**Hello ${message.author.tag}, welcome to ${message.guild.name}!**`)
-                    .setDescription(`I see it is your first time opening a ticket here. If you are here to apply for guild membership, **please do not bother the staff unless you have a problem**.\nThis process is completely automated and handled by me.\nIf you wish to apply you must do the following:\n\`\`\`• Log on to the hypixel network and set your discord account in the social menu (/link tutorial for more information on how to do that.)\n• Use the /link update command so I can confirm you are the owner of that minecraft account. (Make sure you use my /link command not the commands of other bots)\n• Use the /apply command to submit your application. \n\`\`\`If your application is accepted, you will be placed in an invite queue, and **a member of the staff team will invite you when they are online**.`)
-                    .setFooter(`You are seeing this message because it is your first time opening a ticket. This message will not be repeated.`)
-                    .setTimestamp()
-                await message.reply({
-                    embeds: [embed],
-                    ephemeral: true
-                })
-            }
-        })
+        MongoClient.connect()
+        let db = MongoClient.db()
+        let res = await db.collection('tickets').findOne({ sid: 'ticket_introduction_message', discord_id: message.author.id })
+        if (res == undefined) {
+            await db.collection('tickets').insertOne({ sid: 'ticket_introduction_message', discord_id: message.author.id })
+            const embed = new Discord.MessageEmbed()
+                .setTitle(`**Hello ${message.author.tag}, welcome to ${message.guild.name}!**`)
+                .setDescription(`I see it is your first time opening a ticket here. If you are here to apply for guild membership, **please do not bother the staff unless you have a problem**.\nThis process is completely automated and handled by me.\nIf you wish to apply you must do the following:\n\`\`\`• Log on to the hypixel network and set your discord account in the social menu (/link tutorial for more information on how to do that.)\n• Use the /link update command so I can confirm you are the owner of that minecraft account. (Make sure you use my /link command not the commands of other bots)\n• Use the /apply command to submit your application. \n\`\`\`If your application is accepted, you will be placed in an invite queue, and **a member of the staff team will invite you when they are online**.`)
+                .setFooter(`You are seeing this message because it is your first time opening a ticket. This message will not be repeated.`)
+                .setTimestamp()
+            await message.reply({
+                embeds: [embed],
+                ephemeral: true
+            })
+        }
+        MongoClient.close()
     }
 })
 
@@ -230,13 +229,14 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
             }
         }
         let qfilter = {messageid: message.id}
+        MongoClient.connect()
+        let db = MongoClient.db()
         db.collection('starboard').findOne(qfilter, async function (err, res) {
             if (res == undefined) {
                 let starboard = await client.channels.fetch(config.channels.starboardChannelId)
-                starboard.send({embeds: [embed]}).then(async (msg) => {
-                    db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
+                await starboard.send({embeds: [embed]}).then(async (msg) => {
+                    await db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
                         if (err) throw err;
-                        
                     })
                 })
             } else {
@@ -250,6 +250,7 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
                 }
                 
             }
+            MongoClient.close()
         })
     }
 })
@@ -271,12 +272,14 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
             }
         }
         let qfilter = {messageid: message.id}
+        MongoClient.connect()
+        let db = MongoClient.db()
         db.collection('starboard').findOne(qfilter, async function (err, res) {
             if (err) throw err;
             if (res == undefined) {
                 let starboard = await client.channels.fetch(config.channels.starboardChannelId)
-                starboard.send({embeds: [embed]}).then(async (msg) => {
-                    db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
+                await starboard.send({embeds: [embed]}).then(async (msg) => {
+                    await db.collection('starboard').insertOne({messageid: message.id, starboardid: msg.id}, function(err, res) {
                         if (err) throw err;
                         
                     })
@@ -292,6 +295,7 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
                 }
                 
             }
+            MongoClient.close()
         })
     }
 })
@@ -301,7 +305,13 @@ const leaderboardDataUpdateJob = schedule.scheduleJob(config.scheduledEvents.lea
 client.login(process.env.TOKEN)
 
 if (config.chatbridge.enabled) {
-    let bindEvents = function(mclient){
+    let bindEvents = function(mclient, relogAmount) {
+        const chatbridgehook = new Discord.WebhookClient({url: config.chatbridge.webhook})
+        client.on('messageCreate', message => {
+            if (message.channel.id === config.chatbridge.channelId && !message.author.bot && message.author) {
+                mclient.chat(`/gc ${message.member.displayName}: ${message.content}`)
+            }
+        })
         mclient.on('login', () => {
             client.channels.fetch(config.channels.logChannelId).then(channel => {
                 let embed = new Discord.MessageEmbed()
@@ -310,15 +320,8 @@ if (config.chatbridge.enabled) {
                     .setTitle(`${config.emoji.log} LOG`)
                     .addField('ChatBridge - Connection Successfull', `Successfully logged in to hypixel as **${mclient.username}**.`)
                 if (config.chatbridge.relogOnKick.enabled) {
-                    
-                    
-                    db.collection('chatbridge').findOne({ sid: 'onKickRelog' }, async function(err, res){
-                        if (err) throw err;
-                        embed.addField(`Remaining re-login attempts`, `Remaining attempts of logging in after getting kicked: **${res.relogAmount}**`)
-                        channel.send({embeds:[embed]})
-                        
-                        return;
-                    })
+                    embed.addField(`Remaining re-login attempts`, `Remaining attempts of logging in after getting kicked: **${relogAmount}**`)//**${res.relogAmount}**`)
+                    channel.send({embeds:[embed]})
                 } else {
                     channel.send({embeds:[embed]})
                 }
@@ -334,18 +337,10 @@ if (config.chatbridge.enabled) {
                 channel.send({embeds:[embed]})
             })
             if (config.chatbridge.relogOnKick.enabled) {
-                
-                
-                db.collection('chatbridge').findOne({ sid: 'onKickRelog' }, async function(err, res){
-                    if (err) throw err;
-                    if (res.relogAmount>0) {
-                        await db.collection('chatbridge').updateOne({ sid: 'onKickRelog' }, {$set: { relogAmount: res.relogAmount-1 }})
-                        mclient = mineflayer.createBot(mineflayerconfig)
-                        bindEvents(mclient)
-                    }
-                    
-                    return;
-                })
+                if (relogAmount>0) {
+                    mclient = mineflayer.createBot(mineflayerconfig)
+                    bindEvents(mclient, relogAmount-1)
+                }
             }
         })
         mclient.on('messagestr', async (message) => {
@@ -382,31 +377,9 @@ if (config.chatbridge.enabled) {
             }
         })
     }
-    
-    const chatbridgehook = new Discord.WebhookClient({url: config.chatbridge.webhook})
+
     let mclient = mineflayer.createBot(mineflayerconfig)
-    if (config.chatbridge.relogOnKick.enabled) {
-        mclient.once('login', () => {
-            db.collection('chatbridge').findOne({ sid: 'onKickRelog' }, async function (err, res) {
-                if (err) throw err;
-                if (res == null) {
-                    db.collection('chatbridge').insertOne({ sid: 'onKickRelog', relogAmount: config.chatbridge.relogOnKick.relogAmount }, function (err, res) {
-                        if (err) throw err;
-                        return;
-                    })
-                } else {
-                    await db.collection('chatbridge').updateOne({ sid: 'onKickRelog' }, {$set: { relogAmount: config.chatbridge.relogOnKick.relogAmount }})
-                    return;
-                }
-            })
-        })
-    }
-    client.on('messageCreate', message => {
-        if (message.channel.id === config.chatbridge.channelId && !message.author.bot && message.author) {
-            mclient.chat(`/gc ${message.member.displayName}: ${message.content}`)
-        }
-    })
     setTimeout(() => {
-        bindEvents(mclient)
+        bindEvents(mclient, config.chatbridge.relogOnKick.relogAmount)
     }, 500)
 }
