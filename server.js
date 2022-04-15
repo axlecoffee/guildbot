@@ -354,6 +354,12 @@ if (config.chatbridge.enabled) {
                     }
                 })
             }
+            //You cannot say the same message twice!
+            if (message == "You cannot say the same message twice!") {
+                client.channels.fetch(config.chatbridge.channelId).then(channel => {
+                    channel.lastMessage.reply("**You cannot say the same message twice!**")
+                })
+            }
             //let dmex = new RegExp('^From .+: ')
             let gex = new RegExp('^Guild > .+: ')
             //MC username regex ---> ([a-z]|[A-Z]|[0-9]|_){3,16}
