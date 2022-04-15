@@ -57,6 +57,13 @@
         "relogOnKick": {
             "enabled": BOOLEAN,
             "relogAmount": NUMBER
+        },
+        "serverJoinLeaveMessages": {
+            "enabled": BOOLEAN
+        },
+        "guildJoinLeaveMessages": {
+            "enabled": BOOLEAN,
+            "logging": BOOLEAN
         }
     },
     "url":{

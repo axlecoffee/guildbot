@@ -356,9 +356,102 @@ if (config.chatbridge.enabled) {
             }
             //let dmex = new RegExp('^From .+: ')
             let gex = new RegExp('^Guild > .+: ')
+            //MC username regex ---> ([a-z]|[A-Z]|[0-9]|_){3,16}
+            let guildJoin = /^(\[.+\] )?([a-z]|[A-Z]|[0-9]|_){3,16} joined the guild!$/g
+            let guildLeave = /^(\[.+\] )?([a-z]|[A-Z]|[0-9]|_){3,16} left the guild!$/g
+            let serverJoin = new RegExp('^Guild > ([a-z]|[A-Z]|[0-9]|_){3,16} joined\.$')
+            let serverLeave = new RegExp('^Guild > ([a-z]|[A-Z]|[0-9]|_){3,16} left\.$')
+            if (config.chatbridge.serverJoinLeaveMessages.enabled && serverJoin.test(message)) {
+                let name = message.slice(8, message.length-8)
+                let embed = new Discord.MessageEmbed()
+                    .setColor("GREEN")
+                    .setTitle(`**${name}** is now online.`)
+                let response = await fetch(`https://minecraft-api.com/api/uuid/${name}/json`)
+                let namedata = {uuid: undefined};
+                try{namedata = await response.json()}catch(err){console.error}
+                chatbridgehook.send({
+                    'username': name,
+                    'embeds': [embed],
+                    'avatarURL': `https://crafatar.com/renders/head/${namedata.uuid}`
+                })
+            } else if (config.chatbridge.serverJoinLeaveMessages.enabled && serverLeave.test(message)) {
+                let name = message.slice(8, message.length-6)
+                let embed = new Discord.MessageEmbed()
+                    .setColor("RED")
+                    .setTitle(`**${name}** is now offline.`)
+                let response = await fetch(`https://minecraft-api.com/api/uuid/${name}/json`)
+                let namedata = {uuid: undefined};
+                try{namedata = await response.json()}catch(err){console.error}
+                chatbridgehook.send({
+                    'username': name,
+                    'embeds': [embed],
+                    'avatarURL': `https://crafatar.com/renders/head/${namedata.uuid}`
+                })
+            }
+            if (config.chatbridge.guildJoinLeaveMessages.enabled && guildLeave.test(message)){
+                let name = message.split(" ");
+                if (message.startsWith("[")) {name = name[1]} else {name = name[0]}
+                let response = await fetch(`https://minecraft-api.com/api/uuid/${name}/json`)
+                let namedata = {uuid: undefined};
+                try{namedata = await response.json()}catch(err){console.error}
+                let embed = new Discord.MessageEmbed()
+                    .setColor(config.colours.secondary)
+                    .setTitle(`**${name}** has left the guild!`)
+                chatbridgehook.send({
+                    'username': name,
+                    'embeds': [embed],
+                    'avatarURL': `https://crafatar.com/renders/head/${namedata.uuid}`
+                })
+                if (config.chatbridge.guildJoinLeaveMessages.logging) {
+                    await MongoClient.connect()
+                    let db = MongoClient.db()
+                    let res = await db.collection('minecraft-accounts').findOne({ minecraft_uuid: namedata.uuid })
+                    let uuid; if (namedata.uuid == undefined) {uuid = "*unavailable*"} else {uuid = namedata.uuid}
+                    let discordId; if (res == undefined) {discordId = "*unavailable*"} else {discordId = res.discord_id}
+                    let discordTag; if (res == undefined) {discordTag = "*unavailable*"} else {let user = await client.users.fetch(discordId); discordTag = user.tag}
+                    let logembed = new Discord.MessageEmbed()
+                        .setColor(config.colours.secondary)
+                        .setTimestamp()
+                        .setTitle(`${config.emoji.log} LOG`)
+                        .setThumbnail(`https://crafatar.com/renders/head/${namedata.uuid}`)
+                        .addField(`**${name}** has **LEFT** the guild.`, `**Discord account tag:** ${discordTag}\n**Discord account ID:** ${discordId}\n**Minecraft account name:** ${name}\n**Minecraft account UUID:** ${uuid}\n`)
+                    let logchannel = await client.channels.fetch(config.channels.logChannelId)
+                    logchannel.send({embeds: [logembed]})
+                }
+            } else if(config.chatbridge.guildJoinLeaveMessages.enabled && guildJoin.test(message)){
+                let name = message.split(" ");
+                if (message.startsWith("[")) {name = name[1]} else {name = name[0]}
+                let response = await fetch(`https://minecraft-api.com/api/uuid/${name}/json`)
+                let namedata = {uuid: undefined};
+                try{namedata = await response.json()}catch(err){console.error}
+                let embed = new Discord.MessageEmbed()
+                    .setColor(config.colours.secondary)
+                    .setTitle(`**${name}** has joined the guild!`)
+                chatbridgehook.send({
+                    'username': name,
+                    'embeds': [embed],
+                    'avatarURL': `https://crafatar.com/renders/head/${namedata.uuid}`
+                })
+                if (config.chatbridge.guildJoinLeaveMessages.logging) {
+                    await MongoClient.connect()
+                    let db = MongoClient.db()
+                    let res = await db.collection('minecraft-accounts').findOne({ minecraft_uuid: namedata.uuid })
+                    let uuid; if (namedata.uuid == undefined) {uuid = "*unavailable*"} else {uuid = namedata.uuid}
+                    let discordId; if (res == undefined) {discordId = "*unavailable*"} else {discordId = res.discord_id}
+                    let discordTag; if (res == undefined) {discordTag = "*unavailable*"} else {let user = await client.users.fetch(discordId); discordTag = user.tag}
+                    let logembed = new Discord.MessageEmbed()
+                        .setColor(config.colours.secondary)
+                        .setTimestamp()
+                        .setTitle(`${config.emoji.log} LOG`)
+                        .setThumbnail(`https://crafatar.com/renders/head/${namedata.uuid}`)
+                        .addField(`**${name}** has **JOINED** the guild.`, `**Discord account tag:** ${discordTag}\n**Discord account ID:** ${discordId}\n**Minecraft account name:** ${name}\n**Minecraft account UUID:** ${uuid}\n`)
+                    let logchannel = await client.channels.fetch(config.channels.logChannelId)
+                    logchannel.send({embeds: [logembed]})
+                }
+            } 
             if (gex.test(message)) {
                 let part = message.match(gex)[0]
-                let msg = message.replace(gex, "").replace(/<@.*>/g, "").replace(/(@everyone)|(@here)/g, "")
+                let msg = message.replace(gex, "").replace(/(<@.+>)|(@everyone)|(@here)/g, "")
                 if (msg.length < 1) return;
                 let namearr = part.replace(/^Guild > /, "").split(" ")
                 let name = namearr[0]
