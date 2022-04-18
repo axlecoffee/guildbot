@@ -2,7 +2,7 @@
   "name": "guildbot",
   "version": "2.4.0",
   "description": "Discord bot targeted at hypixel guilds. Offers automatic applications with in-game requirements, displaying guild and player info, and more.",
-  "author": "MCUniversity",
+  "author": "emmaexe",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -21,9 +21,9 @@
     "node": "16.x"
   },
   "repository": {
-    "url": "https://github.com/MCUniversity/guildbot",
-    "urlApi": "https://api.github.com/repos/MCUniversity/guildbot",
-    "urlRaw": "https://raw.githubusercontent.com/MCUniversity/guildbot/main/"
+    "url": "https://github.com/emmaexe/guildbot",
+    "urlApi": "https://api.github.com/repos/emmaexe/guildbot",
+    "urlRaw": "https://raw.githubusercontent.com/emmaexe/guildbot/main/"
   },
   "license": "GPL-3.0"
 }

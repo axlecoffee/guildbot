@@ -19,7 +19,7 @@ module.exports = {
         const embed = new Discord.MessageEmbed()
             .setColor(config.colours.secondary)
             .setTimestamp()
-            .setFooter('Developed by @MCUniversity#0859')
+            .setFooter('Developed by @emmaexe#0859')
             .setTitle("Commands:")
         const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
         for (const file of commandFiles) {
