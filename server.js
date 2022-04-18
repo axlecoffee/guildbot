@@ -306,6 +306,7 @@ client.login(process.env.TOKEN)
 
 if (config.chatbridge.enabled) {
     let bindEvents = function(mclient, relogAmount) {
+        module.exports = {mclient: mclient}
         const chatbridgehook = new Discord.WebhookClient({url: config.chatbridge.webhook})
         client.on('messageCreate', message => {
             if (message.channel.id === config.chatbridge.channelId && !message.author.bot && message.author) {
@@ -356,8 +357,10 @@ if (config.chatbridge.enabled) {
             }
             //You cannot say the same message twice!
             if (message == "You cannot say the same message twice!") {
-                client.channels.fetch(config.chatbridge.channelId).then(channel => {
-                    channel.lastMessage.reply("**You cannot say the same message twice!**")
+                client.channels.fetch(config.chatbridge.channelId).then(async channel => {
+                    let msg = channel.lastMessage
+                    await msg.reply({content: "**You cannot say the same message twice!**", ephemeral: true, allowedMentions: { repliedUser: false }})
+                    //await msg.delete()
                 })
             }
             //let dmex = new RegExp('^From .+: ')

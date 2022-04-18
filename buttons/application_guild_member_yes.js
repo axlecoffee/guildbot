@@ -5,6 +5,7 @@ const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const config = require('../config.json')
 const functions = require('../functions.js')
+const server = require('../server.js')
 
 module.exports = {
     async execute(client, interaction) {
@@ -13,6 +14,21 @@ module.exports = {
         let userID;
         await MongoClient.connect()
         const db = MongoClient.db()
+
+        let timeNow = Math.round(Date.now()/1000)
+        let appban = await db.collection('guild_application_bans').findOne({ discord_id: interaction.user.id })
+        if (appban != undefined) {
+            if (appban.end_timestamp > timeNow) {
+                let embed = new Discord.MessageEmbed()
+                    .setColor(config.colours.error)
+                    .setTimestamp()
+                    .setThumbnail(interaction.user.displayAvatarURL())
+                    .setTitle(`**Error. Could not complete guild application.**`)
+                    .addField(`**You are banned from submitting guild applications.**`, `Ban date: *<t:${appban.start_timestamp}:R> (<t:${appban.start_timestamp}:F>)*\nReason for ban: *${appban.reason}*\nBan ends: *<t:${appban.end_timestamp}:R> (<t:${appban.end_timestamp}:F>)*`)
+                return interaction.update({ embeds: [embed], components: [] })
+            }
+        }
+
         db.collection('minecraft-accounts').findOne({discord_id: interaction.user.id}, async function (err, res) {
             if (err) throw err;
             if (res == undefined) {
@@ -56,7 +72,12 @@ module.exports = {
                             helperPing+=`<@&${config.roles.helperRole[i]}>`
                         }
                         if (helperPing!="") {
-                            message.channel.send(helperPing)
+                            //message.channel.send(helperPing)
+                        }
+                        if (config.chatbridge.enabled && config.chatbridge.autoInviteOnApp) {
+                            const mclient = server.mclient;
+                            mclient.chat(`/g invite ${userData}`)
+                            sucessembed.addField(`AutoInvite is turned on.`, `The bot has attempted to send you an automatic invite. If you did not recieve it or missed it, you can reapply for another automatic invite if there are no staff available to invite you to the guild.`)
                         }
                         interaction.update({
                             embeds: [sucessembed],
@@ -95,7 +116,7 @@ module.exports = {
                         let nembed = new Discord.MessageEmbed()
                             .setColor(config.colours.main)
                             .setTimestamp()
-                            .setTitle(`**We're sorry but you do not meet the requirements to join the guild.**\nRequired network level: 50\nYour network level: ${networkLevelRaw}`)
+                            .setTitle(`**We're sorry but you do not meet the requirements to join the guild.**\nRequired network level: ${config.guildAppReqs.minNetworkLevel}\nYour network level: ${networkLevelRaw}`)
                         interaction.update({
                             embeds: [nembed],
                             components: []
@@ -105,7 +126,7 @@ module.exports = {
                             .setTimestamp()
                             .setAuthor(interaction.user.tag)
                             .setThumbnail(interaction.user.displayAvatarURL())
-                            .addField('**Failed application**', `**User did not meet the network level 50 requirement.**\nTheir IGN: ${userData}\nTheir NW level: ${networkLevelRaw}`)
+                            .addField('**Failed application**', `**User did not meet the network level ${config.guildAppReqs.minNetworkLevel} requirement.**\nTheir IGN: ${userData}\nTheir NW level: ${networkLevelRaw}`)
                         channel = client.channels.cache.get(config.channels.appChannelId)
                         channel.send({
                             embeds: [logembed]

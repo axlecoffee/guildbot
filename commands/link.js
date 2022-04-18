@@ -25,7 +25,7 @@ module.exports = {
             .setName('check')
             .setDescription('Check the status of someone\'s account link or your own.')
             .addUserOption(userOption => userOption
-                .setName('user')
+                .setName('target')
                 .setDescription('Select the user.')
                 .setRequired(true)
             )
@@ -49,7 +49,7 @@ module.exports = {
         if (interaction.options.getSubcommand() == 'check') {
             await MongoClient.connect()
             const db = MongoClient.db()
-            let user = interaction.options.getUser('user')
+            let user = interaction.options.getUser('target')
             db.collection('minecraft-accounts').findOne({ discord_id: user.id },function(err, res){
                 if (err) throw err;
                 let userData;

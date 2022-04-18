@@ -89,11 +89,27 @@ The **config.json** file is used for saving less sesitive configuration data.
         "relogOnKick": {
             "enabled": BOOLEAN,
             "relogAmount": NUMBER
-        }
+        },
+        "serverJoinLeaveMessages": {
+            "enabled": BOOLEAN
+        },
+        "guildJoinLeaveMessages": {
+            "enabled": BOOLEAN,
+            "logging": BOOLEAN
+        },
+        "autoInviteOnApp": BOOLEAN
     },
     "url":{
         "guild_staff_application":"URL",
         "forums_post":"URL"
+    },
+    "guildAppReqs":{
+        "textReqs": [
+            STRING,
+            STRING,
+            ...
+        ],
+        "minNetworkLevel": NUMBER
     },
     "starboard":{
         "minimumCount": NUMBER
@@ -174,6 +190,14 @@ For more complex configuration check the module's [repository on npmjs.com](http
 - **messagelogging** allows you to log all raw messages to a channel. Should really only be used for debugging.
 
 - **relogOnKick** allows the bot to re-login **relogAmount** of times after getting kicked from the server. The **relogAmount** limit exists to stop the account from getting accidentally banned for spam-logins in case some error occurs.
+
+- **ServerJoinLeaveMessages** defines if the guild members logging on/off should be displayed in discord.
+
+- **GuildJoinLeaveMessages** defines if members joining or leaving the guild should be displayed in discord. Aditionally, **Logging** defines if a copy of the message should be sent to the logs channel with extended information.
+
+- **autoInviteOnApp** defines if members should be automatically invited by the minecraft bot once their applications in the discord server are successfull.
+
+**guildAppReqs** defines settings used in the guild application process. **textReqs** is an array of strings that define simple requirements unenforceable by the bot. **minNetworkLevel** is the minimum hypixel network level required for members to be able to join.
 
 **starboard** contains configuration options for the starboard feature
 

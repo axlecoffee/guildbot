@@ -64,7 +64,8 @@
         "guildJoinLeaveMessages": {
             "enabled": BOOLEAN,
             "logging": BOOLEAN
-        }
+        },
+        "autoInviteOnApp": BOOLEAN
     },
     "url":{
         "guild_staff_application":"URL",

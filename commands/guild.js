@@ -28,7 +28,7 @@ module.exports = {
             .setName('checkuser')
             .setDescription("Fetch data about a user.")
             .addUserOption(option => option
-                .setName('user')
+                .setName('target')
                 .setDescription('Discord username')
                 .setRequired(true)
             )
@@ -43,7 +43,7 @@ module.exports = {
         ),
     async execute(client, interaction) {
         if (interaction.options.getSubcommand() == 'checkuser') {
-            let discordUser = interaction.options.getUser('user')
+            let discordUser = interaction.options.getUser('target')
             await MongoClient.connect()
             const db = MongoClient.db()
             let res = await db.collection('minecraft-accounts').findOne({ discord_id: discordUser.id })

@@ -28,7 +28,7 @@ module.exports = {
             .setDescription('Force a guild membership application')
             .addUserOption(option =>
                 option
-                .setName('user')
+                .setName('target')
                 .setDescription('The targeted user (mc acc MUST be linked).')
                 .setRequired(true)
             )
@@ -45,7 +45,7 @@ module.exports = {
         ),
     async execute(client, interaction) {
         if (interaction.options.getSubcommand() == 'force-apply') {
-            let discordUser = interaction.options.getUser('user')
+            let discordUser = interaction.options.getUser('target')
             await MongoClient.connect()
             const db = MongoClient.db()
             db.collection("minecraft-accounts").findOne({ discord_id: discordUser.id }, async function (err, res) {
