@@ -23,13 +23,13 @@ client.on('error', async (err) => {
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    MongoClient.connect()
+    await MongoClient.connect()
     let db = MongoClient.db()
     db.collection('starboard').findOne({}, async function (err, res) {
         if (err) throw err;
         if (res != undefined) {
             await db.collection('starboard').drop()
-            MongoClient.close()
+            await MongoClient.close()
         }
     })
     if (client.user.id == "886676473019269160") {
@@ -75,7 +75,7 @@ client.on('interactionCreate', async (interaction) => {
             command: interaction.commandName
         }
         if (command.cooldown) {
-            MongoClient.connect()
+            await MongoClient.connect()
             let db = MongoClient.db()
             let nextAvailable = await db.collection('cooldown').findOne(qfilter)
             if (nextAvailable == undefined) nextAvailable = 0;
@@ -150,7 +150,7 @@ client.on('guildMemberRemove', async (member) => {
 client.on('messageCreate', async (message) => {
     if (message.guild.id != config.discordGuildId) return;
     if (message.channel.type == 'GUILD_TEXT' && message.channel.name.startsWith('ticket-') && !message.author.bot) {
-        MongoClient.connect()
+        await MongoClient.connect()
         let db = MongoClient.db()
         let res = await db.collection('tickets').findOne({ sid: 'ticket_introduction_message', discord_id: message.author.id })
         if (res == undefined) {
@@ -229,7 +229,7 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
             }
         }
         let qfilter = {messageid: message.id}
-        MongoClient.connect()
+        await MongoClient.connect()
         let db = MongoClient.db()
         db.collection('starboard').findOne(qfilter, async function (err, res) {
             if (res == undefined) {
@@ -272,7 +272,7 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
             }
         }
         let qfilter = {messageid: message.id}
-        MongoClient.connect()
+        await MongoClient.connect()
         let db = MongoClient.db()
         db.collection('starboard').findOne(qfilter, async function (err, res) {
             if (err) throw err;
