@@ -8,22 +8,12 @@ require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.guild != undefined) {
-    permissions = config.permissions.guild
-    setDef = false
-}
-
 module.exports = {
     help: true,
     cooldown: 2000,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('guild')
         .setDescription(`Access data about the guild and its members.`)
-        .setDefaultPermission(setDef)
         .addSubcommand(subcommand => subcommand
             .setName('checkuser')
             .setDescription("Fetch data about a user.")

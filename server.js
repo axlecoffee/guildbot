@@ -32,13 +32,8 @@ client.on('ready', async () => {
             await MongoClient.close()
         }
     })
-    if (client.user.id == "886676473019269160") {
-        console.log(`Test user detected, setting presence to OFFLINE.`)
-        client.user.setPresence({ status: 'invisible' })
-    } else {
-        guild = await client.guilds.fetch(config.discordGuildId)
-        client.user.setActivity(`over ${guild.name}`, {type: "WATCHING"})
-    }
+    guild = await client.guilds.fetch(config.discordGuildId)
+    client.user.setActivity(`over ${guild.name}`, {type: "WATCHING"})
     client.commands = new Discord.Collection();
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {const command = require(`./commands/${file}`); client.commands.set(command.data.name, command);}

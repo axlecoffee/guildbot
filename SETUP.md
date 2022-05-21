@@ -45,12 +45,6 @@ The **config.json** file is used for saving less sesitive configuration data.
         "helpers":["DISCORDID", "DISCORDID", ...],
         "adminRole":["DISCORDID", "DISCORDID", ...]
     },
-    "permissions": {
-        "emit":[{"id":"DISCORDID","type":1,"permission":true}],
-        "emojify":[{"id":"DISCORDID","type":1,"permission":true}],
-        "summon":[{"id":"DISCORDID","type":1,"permission":true}],
-        ...
-    },
     "scheduledEvents": {
         "leaderboardDataUpdate":"*/1 * * * *"
     },
@@ -135,8 +129,6 @@ The **config.json** file is used for saving less sesitive configuration data.
 - **helpers** are the roles that get pinged when an application is accepted so they can invite the member.
 
 - **adminRole** is the administrator role.
-
-**permissions** is an object containing arrays of command permissions. Every item in the object has the name of a command. Every item's array contains objects with the following format: {id: "DISCORD_ROLE_OR_USER_ID", type: 1_OR_2, permission: true_OR_false}. For more info on how to setup the command permission check these [discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 
 **scheduledEvents** contains strings for various repeating scheduled tasks that are used by [node-schedule](https://www.npmjs.com/package/node-schedule). They are formatted like this:
 

@@ -70,7 +70,7 @@ module.exports = {
                         })
                         totalExp = avgExp;
                         avgExp /= c;
-                        let rank;
+                        let rank = {"name": undefined, "default": false, "tag": undefined, "created": undefined, "priority": undefined};
                         if (member.rank == "GUILDMASTER" || member.rank == "Guild Master") {
                             rank = {
                                 "name": "Guild Master",

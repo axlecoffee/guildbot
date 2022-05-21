@@ -4,21 +4,11 @@ const config = require('../config.json')
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.summon != undefined) {
-    permissions = config.permissions.summon
-    setDef = false
-}
-
 module.exports = {
     help: false,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('summon')
-        .setDefaultPermission(setDef)
-        .setDescription(`Summons a demon. Don't let Chongyun find you.`)
+        .setDescription(`Summons an object.`)
         .addSubcommand(command => command
             .setName('menu')
             .setDescription('Summon a dropdown menu')

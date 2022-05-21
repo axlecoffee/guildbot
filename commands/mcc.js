@@ -9,20 +9,10 @@ const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const functions = require('../functions.js')
 const server = require('../server.js')
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.emit != undefined) {
-    permissions = config.permissions.emit
-    setDef = false
-}
-
 module.exports = {
     help: false,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('mcc')
-        .setDefaultPermission(setDef)
         .setDescription(`Control your ChatBridge minecraft account from discord.`)
         .addSubcommand(command => command
             .setName('ginvite')

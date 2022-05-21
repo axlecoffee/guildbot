@@ -2,17 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.apply != undefined) {
-    permissions = config.permissions.apply
-    setDef = false
-}
-
 module.exports = {
     help: true,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('apply')
         .setDescription(`List of available guild applications.`),

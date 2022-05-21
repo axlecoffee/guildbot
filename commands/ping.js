@@ -3,20 +3,10 @@ const Discord = require('discord.js')
 const config = require('../config.json')
 const functions = require('../functions.js')
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.ping != undefined) {
-    permissions = config.permissions.ping
-    setDef = false
-}
-
 module.exports = {
     help: true,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('ping')
-        .setDefaultPermission(setDef)
         .setDescription(`View the bot's latency.`),
     async execute(client, interaction) {
         let aembed = new Discord.MessageEmbed()

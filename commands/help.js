@@ -6,21 +6,11 @@ require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.help != undefined) {
-    permissions = config.permissions.help
-    setDef = false
-}
-
 module.exports = {
     help: true,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('help')
-        .setDescription(`Show useful information about the bot.`)
-        .setDefaultPermission(setDef),
+        .setDescription(`Show useful information about the bot.`),
     async execute(client, interaction) {
         let buttonFoward = new Discord.MessageButton()
             .setStyle(2)

@@ -2,21 +2,11 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.emojify != undefined) {
-    permissions = config.permissions.emojify
-    setDef = false
-}
-
 module.exports = {
     help: false,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('emojify')
         .setDescription(`Change nickname prefix of all server members to an emoji.`)
-        .setDefaultPermission(setDef)
         .addStringOption(option => {
             option
                 .setName("emoji")

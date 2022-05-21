@@ -13,12 +13,6 @@
         "helpers":["DISCORDID", "DISCORDID", ...],
         "adminRole":["DISCORDID", "DISCORDID", ...]
     },
-    "permissions": {
-        "emit":[{"id":"DISCORDID","type":1,"permission":true}],
-        "emojify":[{"id":"DISCORDID","type":1,"permission":true}],
-        "summon":[{"id":"DISCORDID","type":1,"permission":true}],
-        ...
-    },
     "scheduledEvents": {
         "leaderboardDataUpdate":"*/1 * * * *"
     },

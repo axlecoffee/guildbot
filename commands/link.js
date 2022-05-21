@@ -6,21 +6,11 @@ require('dotenv').config()
 const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.link != undefined) {
-    permissions = config.permissions.link
-    setDef = false
-}
-
 module.exports = {
     help: true,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('link')
         .setDescription(`Minecraft account linking system.`)
-        .setDefaultPermission(setDef)
         .addSubcommand(subCommand => subCommand
             .setName('check')
             .setDescription('Check the status of someone\'s account link or your own.')

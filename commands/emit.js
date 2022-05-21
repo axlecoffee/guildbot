@@ -8,20 +8,10 @@ const mongo = require('mongodb')
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
 const functions = require('../functions.js')
 
-let permissions = undefined
-let setDef = true
-
-if (config.permissions.emit != undefined) {
-    permissions = config.permissions.emit
-    setDef = false
-}
-
 module.exports = {
     help: false,
-    permissions: permissions,
     data: new SlashCommandBuilder()
         .setName('emit')
-        .setDefaultPermission(setDef)
         .setDescription(`Emit an event.`)
         .addSubcommand(command => command
             .setName('force-apply')
