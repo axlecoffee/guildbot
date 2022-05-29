@@ -153,7 +153,7 @@ client.on('messageCreate', async (message) => {
             const embed = new Discord.MessageEmbed()
                 .setTitle(`**Hello ${message.author.tag}, welcome to ${message.guild.name}!**`)
                 .setDescription(`I see it is your first time opening a ticket here. If you are here to apply for guild membership, **please do not bother the staff unless you have a problem**.\nThis process is completely automated and handled by me.\nIf you wish to apply you must do the following:\n\`\`\`• Log on to the hypixel network and set your discord account in the social menu (/link tutorial for more information on how to do that.)\n• Use the /link update command so I can confirm you are the owner of that minecraft account. (Make sure you use my /link command not the commands of other bots)\n• Use the /apply command to submit your application. \n\`\`\`If your application is accepted, you will be placed in an invite queue, and **a member of the staff team will invite you when they are online**.`)
-                .setFooter(`You are seeing this message because it is your first time opening a ticket. This message will not be repeated.`)
+                .setFooter({text: `You are seeing this message because it is your first time opening a ticket. This message will not be repeated.`})
                 .setTimestamp()
             await message.reply({
                 embeds: [embed],
@@ -212,7 +212,7 @@ client.on('messageReactionAdd', async (messageReaction, user) => {
         message.react(`${config.emoji.star}`)
         let embed = new Discord.MessageEmbed()
             .setAuthor(message.author.tag.toString(), message.author.displayAvatarURL())
-            .setFooter(`${messageReaction.count}⭐`)
+            .setFooter({text: "`${messageReaction.count}⭐`"})
             .setTimestamp()
         desc = `**[Jump to message](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id})**\n`
         if (message.content) {desc+=message.content}
@@ -255,7 +255,7 @@ client.on('messageReactionRemove', async (messageReaction, user) => {
     if (messageReaction.emoji.name == "⭐" && message.guild.id == config.discordGuildId && message.author.id != client.user.id && messageReaction.count >= config.starboard.minimumCount) {
         let embed = new Discord.MessageEmbed()
             .setAuthor(message.author.tag.toString(), message.author.displayAvatarURL())
-            .setFooter(`${messageReaction.count}⭐`)
+            .setFooter({text: `${messageReaction.count}⭐`})
             .setTimestamp()
         desc = `**[Jump to message](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id})**\n`
         if (message.content) {desc+=message.content}

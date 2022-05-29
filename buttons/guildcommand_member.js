@@ -29,7 +29,7 @@ module.exports = {
                         .setColor(config.colours.main)
                         .setTimestamp()
                         .setTitle(`**${rank}** ${mun.pseudo} - Guild member data`)
-                        .setFooter(`uuid: ${passedData.uuid}`)
+                        .setFooter({text: `uuid: ${passedData.uuid}`})
                         .addField("Rank", `${member.rank}`)
                         .addField("Joined guild", `${new Date(member.joined)}`)
                         .addField("Exp history", dateField)

@@ -22,7 +22,7 @@ module.exports = {
             .setTimestamp()
             .setTitle("Found a bug? Have a feature request? Need help?")
             .setDescription(`${config.emoji.github} [GitHub](https://github.com/emmaexe/guildbot)`)
-            .setFooter(`Developed by ${pkg.author}>`)
+            .setFooter({text: 'Developed by @emmaexe#0859'})
         interaction.update({
             embeds: [embed],
             components: [row]

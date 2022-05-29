@@ -94,7 +94,7 @@ module.exports = {
                                 .setColor(config.colours.main)
                                 .setTimestamp()
                                 .setTitle(`**${rank}** ${inGameName} - Guild member data`)
-                                .setFooter(`uuid: ${member.uuid}`)
+                                .setFooter({text: `uuid: ${member.uuid}`})
                                 .addField("Rank", `${member.rank}`)
                                 .addField("Joined guild", `${new Date(member.joined)}`)
                                 .addField("Exp history", dateField)
@@ -217,7 +217,7 @@ module.exports = {
             if (data.guild.tag) gtag = `**[${data.guild.tag}]** `
             let embed = new Discord.MessageEmbed()
                 .setTitle(`${gtag}${data.guild.name}`)
-                .setFooter(`uuid: ${data.guild._id}`)
+                .setFooter({text: `uuid: ${data.guild._id}`})
                 .setTimestamp()
                 .setColor(config.colours.main)
                 .addField(`Created on:`, `${new Date(data.guild.created)}`)

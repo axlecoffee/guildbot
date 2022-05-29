@@ -34,7 +34,7 @@ module.exports = {
             .setColor(config.colours.main)
             .setTimestamp()
             .setTitle(`**${rank}** ${name} - User data`)
-            .setFooter(`uuid: ${passedData.uuid}`)
+            .setFooter({text: `uuid: ${passedData.uuid}`})
             .addField("Minecraft version: ", `${mcVer}`)
             .addField("Network level: ", `${networkLevel}`)
             //.addField("Network exp: ", `${exp}`)

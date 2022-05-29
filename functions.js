@@ -124,6 +124,25 @@ module.exports = {
         }
         return obj;
     },
+    async fetchJSON(url) {
+        let rawData = undefined;
+        try {
+            rawData = await fetch(url);
+        } catch(err){ console.error(err); }
+        if (rawData === undefined) {
+            return undefined;
+        } else {
+            let parsedData = undefined;
+            try {
+                parsedData = rawData.json();
+            } catch (err) { console.error(err); }
+            if (parsedData === undefined) {
+                return undefined;
+            } else {
+                return parsedData;
+            }
+        }
+    },
     hypixelUtil: {
         networkLevelFromExp(exp) {
             return (Math.sqrt((2 * parseInt(exp)) + 30625) / 50) - 2.5

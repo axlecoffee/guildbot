@@ -56,7 +56,7 @@ module.exports = {
                 .addField("Bot library", "[**Discord.js v13**](https://discord.js.org/#/docs/main/)", true)
                 .addField("Created on", `${client.user.createdAt}`)
                 .setThumbnail(client.user.displayAvatarURL())
-                .setFooter('Developed by @emmaexe#0859')
+                .setFooter({text: 'Developed by @emmaexe#0859'})
             if (!interaction.guild.roles.everyone.permissions.has(Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) {
                 if (!interaction.channel.permissionsFor(interaction.guild.roles.everyone).has(Discord.Permissions.FLAGS.USE_EXTERNAL_EMOJIS)) {
                     embed.addField(':warning: External emoji could not be displayed!', 'For external emoji to be displayed properly within slash commands, the @everyone role in your server needs to have the "Use External Emoji" permission.')    

@@ -17,8 +17,7 @@ module.exports = {
                     .setName('object')
                     .setDescription('Select and object you would like to summon.')
                     .setRequired(true)
-                    .addChoice('Select menu for colour roles', 'colour')
-                    .addChoice('Select menu for notification roles', 'pings')
+                    .addChoices({name: "Select menu for colour roles", value: "colour"}, {name: "Select menu for notification roles", value: "pings"})
             )
         )
         .addSubcommand(command => command
@@ -100,7 +99,7 @@ module.exports = {
                     let embed = new Discord.MessageEmbed()
                         .setTitle(`Kickwave calculation`)
                         .setColor(config.colours.secondary)
-                        .setFooter(`Data last updated ${minutes}min ${seconds}sec ago.`)
+                        .setFooter({text: `Data last updated ${minutes}min ${seconds}sec ago.`})
                     content = "```json\n[\n"
                     let leaderBoardData = res.data
                     let arrData = Object.entries(leaderBoardData)

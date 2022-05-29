@@ -75,9 +75,5 @@
     },
     "starboard":{
         "minimumCount": NUMBER
-    },
-    "emojify":{
-        "halloween":{"e": ["🍬", "🎃", "👻", "🦇"], "desc":"Halloween emoji"},
-        "christmas":{"e": ["🎄", "⛄", "🎁", "🍪"], "desc":"Christmas emoji"}
     }
 }

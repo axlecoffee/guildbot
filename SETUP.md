@@ -107,10 +107,6 @@ The **config.json** file is used for saving less sesitive configuration data.
     },
     "starboard":{
         "minimumCount": NUMBER
-    },
-    "emojify":{
-        "halloween":{"e": ["🍬", "🎃", "👻", "🦇"], "desc":"Halloween emoji"},
-        "christmas":{"e": ["🎄", "⛄", "🎁", "🍪"], "desc":"Christmas emoji"}
     }
 }
 
@@ -194,12 +190,6 @@ For more complex configuration check the module's [repository on npmjs.com](http
 **starboard** contains configuration options for the starboard feature
 
 - **minimumCount** defines the minimum amount of stars a message needs before being sent to the starboard.
-
-**emojify** contains emoji for the /emojify command. The command allows administrators to add random emoji prefixes to all guild members. You may add your own options if you wish, using this formula (There is no coded limit to the amount of various emoji, but don't go over the top. Too many may lag the bot. Putting one will result in that single emoji being applied everywhere):
-
-```json
-"name_of_option": {"e":["emoji1", "emoji2"], "desc":"A short description of this option"}
-```
 
 ## MongoDB
 
