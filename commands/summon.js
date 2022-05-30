@@ -1,8 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const config = require('../config.json')
-const mongo = require('mongodb')
+const mongo = require('mongodb');
 const MongoClient = new mongo.MongoClient(process.env.MONGO_URL)
+
+
 
 module.exports = {
     help: false,
@@ -12,12 +14,13 @@ module.exports = {
         .addSubcommand(command => command
             .setName('menu')
             .setDescription('Summon a dropdown menu')
-            .addStringOption(option => 
-                option
-                    .setName('object')
-                    .setDescription('Select and object you would like to summon.')
-                    .setRequired(true)
-                    .addChoices({name: "Select menu for colour roles", value: "colour"}, {name: "Select menu for notification roles", value: "pings"})
+            .addStringOption(option => {
+                option.setName('object').setDescription('Select and object you would like to summon.').setRequired(true)
+                for (let i = 0;i<config.selectMenus.length;i++) {
+                    option.addChoices({name: config.selectMenus[i].description, value: config.selectMenus[i].name})
+                }
+                return option;
+                }
             )
         )
         .addSubcommand(command => command
@@ -37,49 +40,18 @@ module.exports = {
         ,
     async execute(client, interaction) {
         if (interaction.options.getSubcommand() == 'menu') {
-            if (interaction.options.getString('object') == "colour") {
-                const pink = {value: 'rr_pink', label: 'Pink', description: 'Get the pink role colour', emoji: '897544182959333407'}
-                const purple = {value: 'rr_purple', label: 'Purple', description: 'Get the purple role colour', emoji: '897544182908985354'}
-                const blue = {value: 'rr_blue', label: 'Blue', description: 'Get the blue role colour', emoji: '897544182938353684'}
-                const aqua = {value: 'rr_aqua', label: 'Aqua', description: 'Get the aqua role colour', emoji: '897544183013867560'}
-                const green = {value: 'rr_green', label: 'Green', description: 'Get the green role colour', emoji: '897544182875447357'}
-                const yellow = {value: 'rr_yellow', label: 'Yellow', description: 'Get the yellow role colour', emoji: '897544183001264209'}
-                const orange = {value: 'rr_orange', label: 'Orange', description: 'Get the orange role colour', emoji: '897544182938341446'}
-                const red = {value: 'rr_red', label: 'Red', description: 'Get the red role colour', emoji: '897544182988693524'}
-                const lightpink = {value: 'rr_lightpink', label: 'Light Pink', description: 'Get the light pink role colour', emoji: '897544182997086238'}
-                const lightpurple = {value: 'rr_lightpurple', label: 'Light Purple', description: 'Get the light purple role colour', emoji: '897544182992871456'}
-                const lightblue = {value: 'rr_lightblue', label: 'Light Blue', description: 'Get the light blue role colour', emoji: '897544182980296704'}
-                const ultralightblue = {value: 'rr_ultralightblue', label: 'Ultra-Light Blue', description: 'Get the ultra light blue role colour', emoji: '897544182854467614'}
-                const lightaqua = {value: 'rr_lightaqua', label: 'Light Aqua', description: 'Get the light aqua role colour', emoji: '897544182883827722'}
-                const lightgreen = {value: 'rr_lightgreen', label: 'Light Green', description: 'Get the light green role colour', emoji: '897544182984499311'}
-                const lightyellow = {value: 'rr_lightyellow', label: 'Light Yellow', description: 'Get the light yellow role colour', emoji: '897544182854463528'}
-                const lightred = {value: 'rr_lightred', label: 'Light Red', description: 'Get the light red role colour', emoji: '897544183013855293'}
-    
-                const menu = new Discord.MessageSelectMenu()
-                    .setPlaceholder("Select a colour role.")
-                    .setCustomId("reactionroles")
-                    .addOptions([pink, purple, blue, aqua, green, yellow, orange, red, lightpink, lightpurple, lightblue, ultralightblue, lightaqua, lightgreen, lightyellow, lightred])
-                    .setMaxValues(16)
-                    .setMinValues(0)
-                const row = new Discord.MessageActionRow()
-                    .addComponents(menu)
-                interaction.channel.send({content: "​", components: [row]}) //ZERO-WIDTH SPACE
-                interaction.reply({content: "Object summoned successfully.", ephemeral: true})
-            } else if (interaction.options.getString('object') == "pings") {
-                const updatePings = {value: 'rr_updates', label: 'Updates and announcements', description: 'Recieve a ping for important updates and announcements.', emoji: '📣'}
-                const giveawayPings = {value: 'rr_giveaways', label: 'Giveaways', description: 'Recieve a ping for giveaways.', emoji: '🎉'}
-                const lookingForParty = {value: 'rr_lfp', label: 'Looking for party', description: 'Get pinged by other players when they are looking for a party.', emoji: '797755651022913597'}
-                const menu = new Discord.MessageSelectMenu()
-                    .setPlaceholder("Select a notification role")
-                    .setCustomId("pingingroles")
-                    .addOptions([updatePings, giveawayPings, lookingForParty])
-                    .setMaxValues(3)
-                    .setMinValues(0)
-                const row = new Discord.MessageActionRow()
-                    .addComponents(menu)
-                interaction.channel.send({content: "​", components: [row]}) //ZERO-WIDTH SPACE
-                interaction.reply({content: "Object summoned successfully.", ephemeral: true})
-            }
+            let menuConfig = config.selectMenus.find(menu => menu.name === interaction.options.getString('object'));
+            const menu = new Discord.MessageSelectMenu()
+                .setCustomId(menuConfig.name)
+                .setPlaceholder(menuConfig.placeholder)
+                .setOptions(menuConfig.options)
+                .setMaxValues(menuConfig.maxValues)
+                .setMinValues(menuConfig.minValues)
+                .setDisabled(menuConfig.disabled)
+            const row = new Discord.MessageActionRow()
+                .addComponents(menu)
+            interaction.channel.send({content: "​", components: [row]}) //ZERO-WIDTH SPACE
+            interaction.reply({content: "Object summoned successfully.", ephemeral: true})
         } else if (interaction.options.getSubcommand() == 'kickwave') {
             //Calculate players who contributed the least in the last 7 days.
             await MongoClient.connect()

@@ -55,7 +55,7 @@ client.on('interactionCreate', async (interaction) => {
     } else if (interaction.isSelectMenu()) {
         functions.statistics.increaseSelectMenuCount()
         try {
-            let interactionFile = require(`./menu/${interaction.customId}.js`);
+            let interactionFile = require(`./select-menus-handler.js`);
             interactionFile.execute(client, interaction)
         } catch (err) {
             return console.error(err);
@@ -131,14 +131,16 @@ client.on('interactionCreate', async (interaction) => {
 client.on('guildMemberAdd', async (member) => {
     if (member.guild.id == config.discordGuildId) {
         let num = member.guild.memberCount;
-        member.guild.channels.cache.get(config.channels.memberCount.discord).setName(`📊Members: ${num}📊`);
+        let channel = await member.guild.channels.fetch(config.channels.memberCount.discord);
+        channel.setName(`📊Members: ${num}📊`);
     }
 });
 
 client.on('guildMemberRemove', async (member) => {
     if (member.guild.id == config.discordGuildId) {
         let num = member.guild.memberCount;
-        member.guild.channels.cache.get(config.channels.memberCount.discord).setName(`📊Members: ${num}📊`);
+        let channel = await member.guild.channels.fetch(config.channels.memberCount.discord);
+        channel.setName(`📊Members: ${num}📊`);
     }
 });
 

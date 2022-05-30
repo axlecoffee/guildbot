@@ -72,6 +72,29 @@ The **config.json** file is used for saving less sesitive configuration data.
         "plus":"<:plus:888072519582634075>",
         "minus":"<:minus:888072653003452516>"
     },
+    "selectMenus": [
+        {
+            "name":"UNIQUE_STRING",
+            "description":"STRING",
+            "placeholder":"STRING",
+            "disabled":BOOLEAN,
+            "maxValues":INTEGER,
+            "minValues":INTEGER,
+            "options":[
+                {"value": "UNIQUE_STRING-example_name_1", "label": "STRING", "description": "STRING", "emoji": "EMOJI"},
+                {"value": "UNIQUE_STRING-example_name_2", "label": "STRING", "description": "STRING", "emoji": "EMOJI"},
+                {"value": "UNIQUE_STRING-example_name_3", "label": "STRING", "description": "STRING", "emoji": "EMOJI"},
+                ...
+            ],
+            "actions": {
+                "UNIQUE_STRING-example_name_1":{ "actionType":"toggleRole", "roleID":"DISCORDID" },
+                "UNIQUE_STRING-example_name_2":{ "actionType":"removeRole", "roleID":"DISCORDID" },
+                "UNIQUE_STRING-example_name_3":{ "actionType":"addRole", "roleID":"DISCORDID" },
+                ...
+            }
+        },
+        ...
+    ],
     "chatbridge":{
         "enabled":BOOLEAN,
         "channelId": "DISCORDID",
@@ -166,6 +189,42 @@ For more complex configuration check the module's [repository on npmjs.com](http
 - **forums_post** is the guild's forums post. This is linked when a ticket is created.
 
 **emoji** contains a list of various custom discord emoji you can change to your prefrence, if your bot does not have access to view the default ones.
+
+**selectMenus** is an array of objects that describe custom select select menus that you can use instead of the classic reaction-role system for assigning roles. Every object should have the following attributes:
+
+- **name** is the name and internal ID for the select menu, and as such it should be unique.
+
+- **description** is the description of the select menu that will be shown in the /summon command when you try to create a select menu in a channel.
+
+- **placeholder** is the placeholder for the select menu shown when none of the available options in the menu are selected.
+
+- **disabled** is a true/false boolean that you can use to disable the select menu if needed
+
+- **maxValues** sets the maximum amount of options that can be selected by the user at a time. Must be 0 or higher. Cannot be larger than the amount of options available, or an error will be thrown.
+
+- **minValues** sets the minimum amount of options that can be selected by the user at a time. Must be 0 or higher. Cannot be larger than the amount of options available, or an error will be thrown.
+
+- **options** is an array of objects describing the options in the select menu. Every option must have the following attributes:
+
+  - value - a unique ID for this option
+
+  - label - a label/name for this option
+
+  - description - a description of this option
+
+  - emoji - an emoji to use for this option or the discord ID of a custom emoji
+
+- **actions** contains objects describing what action should be taken when any of the options in the menu are selected. The key of the objects inside of "actions" should match the value of the option in the options array. Every object should contain the following attributes:
+  
+  - actionType - What the bot should do when the option is selected. There are 3 possibilities:
+
+    - toggleRole - Removes the role if the user has the role, or adds it if the user does not have the role.
+
+    - addRole - Only attempts to add the role to the user no matter what
+
+    - removeRole - Only attemts to remove the role from the user no matter what
+
+  - roleID - the discord ID of the role you want to add/remove/toggle.
 
 **chatbridge** is a list of configuration options regarding the two way discord-minecraft chat bridge for the guild. This option requires a separate minecraft account so that the bot can be in the guild at all times sitting in limbo watching guildchat and relaying messages between /gc and a channel in your discord server.
 

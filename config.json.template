@@ -40,6 +40,29 @@
         "plus":"<:plus:888072519582634075>",
         "minus":"<:minus:888072653003452516>"
     },
+    "selectMenus": [
+        {
+            "name":"UNIQUE_STRING",
+            "description":"STRING",
+            "placeholder":"STRING",
+            "disabled":BOOLEAN,
+            "maxValues":INTEGER,
+            "minValues":INTEGER,
+            "options":[
+                {"value": "UNIQUE_STRING-example_name_1", "label": "STRING", "description": "STRING", "emoji": "EMOJI"},
+                {"value": "UNIQUE_STRING-example_name_2", "label": "STRING", "description": "STRING", "emoji": "EMOJI"},
+                {"value": "UNIQUE_STRING-example_name_3", "label": "STRING", "description": "STRING", "emoji": "EMOJI"},
+                ...
+            ],
+            "actions": {
+                "UNIQUE_STRING-example_name_1":{ "actionType":"toggleRole", "roleID":"DISCORDID" },
+                "UNIQUE_STRING-example_name_2":{ "actionType":"removeRole", "roleID":"DISCORDID" },
+                "UNIQUE_STRING-example_name_3":{ "actionType":"addRole", "roleID":"DISCORDID" },
+                ...
+            }
+        },
+        ...
+    ],
     "chatbridge":{
         "enabled":BOOLEAN,
         "channelId": "DISCORDID",
