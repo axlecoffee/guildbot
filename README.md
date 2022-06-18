@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to guildbot 👋</h1>
 <p>
-  <img src="https://img.shields.io/badge/node-16.x-blue.svg" />
+  <img src="https://img.shields.io/badge/node-17.x-blue.svg" />
   <a href="https://github.com/emmaexe/guildbot/wiki" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
@@ -18,7 +18,7 @@
 
 ## Prerequisites
 
-- node 16.x
+- node 17.x
 
 ## Install
 
