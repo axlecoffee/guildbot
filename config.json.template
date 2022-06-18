@@ -28,7 +28,7 @@
         }
     },
     "emoji": {
-        "warning":"<:warning_emoji:868054485992357948>",
+        "warning": "<:warning_emoji:868054485992357948>",
         "error":"<:error_emoji:868054485946224680>",
         "star":"<:GoldStar:905915895937892403>",
         "log":"<:log_emoji:868054485933625346>",
@@ -37,8 +37,15 @@
         "helpButtons":"<:button:913172562001928193>",
         "helpMenus":"<:dropdown_select:914106174754947113>",
         "github":"<:github:888155742719328276>",
+        "discord":"<:DiscordLogoWhite:888158984475918368>",
         "plus":"<:plus:888072519582634075>",
-        "minus":"<:minus:888072653003452516>"
+        "minus":"<:minus:888072653003452516>",
+        "applyCommandMembership":"<:idcard:950739003265654834>",
+        "applyCommandStaff":"👮",
+        "yes":"<:yesx:865887075509338122>",
+        "no":"<:nox:865887075491643402>",
+        "arrowLeft":"◀️",
+        "arrowRight":"▶️"
     },
     "selectMenus": [
         {

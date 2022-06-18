@@ -21,7 +21,7 @@ module.exports = {
             .setColor(config.colours.secondary)
             .setTimestamp()
             .setTitle("Found a bug? Have a feature request? Need help?")
-            .setDescription(`${config.emoji.github} [GitHub](https://github.com/emmaexe/guildbot)`)
+            .setDescription(`${config.emoji.github} [GitHub](https://github.com/emmaexe/guildbot)\n${config.emoji.discord} [Support server](${pkg.supportServer})`)
             .setFooter({text: 'Developed by @emmaexe#0859'})
         interaction.update({
             embeds: [embed],

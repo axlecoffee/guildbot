@@ -26,5 +26,6 @@
     "urlApi": "https://api.github.com/repos/emmaexe/guildbot",
     "urlRaw": "https://raw.githubusercontent.com/emmaexe/guildbot/main/"
   },
+  "supportServer":"https://discord.gg/v4YrAgBRvz",
   "license": "GPL-3.0"
 }
